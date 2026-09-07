@@ -319,6 +319,34 @@ entendiendo que no siempre gana el canal que más vende, sino el que trae client
 
 ---
 
+## Criterio de éxito del proyecto
+
+El proyecto será exitoso si un equipo de Marketing-Growth puede ingresar al sistema
+y comprender rápidamente:
+
+* De dónde llegan sus usuarios.
+* Qué canales generan mejores resultados.
+* En qué etapa del funnel se pierden usuarios.
+* Qué segmentos tienen mayor conversión.
+* Qué campañas generan mejores resultados.
+* Qué experimentos están activos.
+* Qué hipótesis fueron validadas.
+* Dónde existen nuevas oportunidades de crecimiento.
+
+El equipo debería poder recorrer un ciclo completo:
+
+**Detectar una oportunidad → Formular una hipótesis → Diseñar un experimento → Ejecutarlo → Medir resultados → Obtener aprendizaje → Implementar una mejora.**
+
+En términos concretos, el proyecto debería permitir pasar de:
+
+**"Estamos haciendo muchas acciones de marketing, pero no sabemos exactamente cuáles generan crecimiento."**
+
+a:
+
+**"Sabemos dónde estamos perdiendo usuarios, qué hipótesis queremos validar y qué acciones generan un impacto real sobre adquisición, conversión y retención."**
+
+---
+
 ## Información que guarda el sistema
 
 Esta tabla muestra los datos principales que GrowthHub maneja. No es un modelo
@@ -442,3 +470,4 @@ La prioridad indica qué tan indispensable es cada requisito para el MVP:
 | 1.1     | 2026-09-07  | Se agregaron actores, funnel, campañas, canales, segmentos, experimentos, casos de uso y casos de estudio. |
 | 1.2     | 2026-09-07  | Se agregaron restricciones y supuestos, prioridad MoSCoW, modelo de datos simple e historial de cambios. Se hicieron los requisitos no funcionales más medibles. |
 | 1.3     | 2026-09-07  | Se corrigió una contradicción de alcance: GrowthHub registra y analiza campañas, pero no crea las campañas publicitarias (eso se hace en plataformas externas). |
+| 1.4     | 2026-09-07  | Se agregó la sección de criterio de éxito del proyecto. |
