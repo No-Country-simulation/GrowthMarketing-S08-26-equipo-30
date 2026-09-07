@@ -341,56 +341,38 @@ entendiendo que no siempre gana el canal que más vende, sino el que trae client
 
 ## Requisitos No funcionales
 
-### Seguridad
+<div align="center">
 
-* Autenticación de usuarios con usuario y contraseña.
-* Roles y permisos por tipo de usuario: Growth Manager, Campaign Manager y Analyst.
-* Encriptación de contraseñas, tokens de API y datos sensibles.
-* Cumplimiento de normativas de protección de datos personales.
-* Los tokens de la API de Meta se guardan de forma segura y no se muestran en pantalla.
-* Sesión de usuario: si no hay actividad durante 30 minutos, se cierra la sesión por seguridad.
+|ID         |CATEGORIA       |DESCRIPCION DEL REQUISITO  | CRITERIO DE CUMPLIMIENTO |
+|:----------|:---------------|:--------------------------|:-------------------------|
+| RNF-001   | Seguridad      | Autenticación de usuarios con usuario y contraseña | Solo ingresan usuarios registrados |
+| RNF-002   | Seguridad      | Roles y permisos por tipo de usuario | Cada rol accede solo a sus funciones |
+| RNF-003   | Seguridad      | Encriptación de contraseñas, tokens de API y datos sensibles | Los datos sensibles no se guardan en texto plano |
+| RNF-004   | Seguridad      | Los tokens de la API de Meta se guardan de forma segura | Los tokens no se muestran en pantalla |
+| RNF-005   | Seguridad      | Cierre de sesión por inactividad | La sesión se cierra tras 30 minutos sin actividad |
+| RNF-006   | Seguridad      | Cumplimiento de normativas de protección de datos | Se respetan las normas de datos personales |
+| RNF-007   | Capacidad     | Soporte de un volumen grande de datos | Maneja más de 100.000 registros de contactos |
+| RNF-008   | Capacidad     | El embudo muestra el resumen sin demoras perceptibles | La pantalla carga el resumen al instante |
+| RNF-009   | Capacidad     | Muestra datos de demo y datos de Meta al mismo tiempo | Ambos tipos de datos se visualizan juntos |
+| RNF-010   | Compatibilidad | Funciona en web de escritorio | Se usa en Chrome, Edge y Firefox |
+| RNF-011   | Compatibilidad | Se ve correctamente en distintas resoluciones | Se ve bien en escritorio y en proyector |
+| RNF-012   | Confiabilidad  | Disponibilidad de los datos durante la demo | Los datos están disponibles al presentar |
+| RNF-013   | Confiabilidad  | Manejo de fallos de conexión con Meta | Si falla, se conserva la última sincronización |
+| RNF-014   | Confiabilidad  | Los dashboards funcionan sin conexión a Meta | Muestran los datos guardados aunque Meta no responda |
+| RNF-015   | Escabilidad    | Preparado para crecer en usuarios y registros | Admite más usuarios sin cambios de estructura |
+| RNF-016   | Escabilidad    | Permite agregar integraciones y dashboards a futuro | Se suman nuevos canales y métricas sin rediseñar |
+| RNF-017   | Mantenibilidad | Código modular | Se agregan funciones sin afectar las existentes |
+| RNF-018   | Mantenibilidad | Documentación clara para el equipo | El equipo puede mantener y ampliar el sistema |
+| RNF-019   | Mantenibilidad | Configuración de conexión a Meta ajustable | Credenciales e intervalo se cambian sin tocar código |
+| RNF-020   | Facilidad de Uso | Interfaz clara para equipos de marketing | Se entiende el recorrido del usuario |
+| RNF-021   | Facilidad de Uso | Dashboards visuales sin conocimientos técnicos | Se toman decisiones solo mirando los paneles |
+| RNF-022   | Facilidad de Uso | Términos de marketing, no técnicos | Se usan palabras como campaña, canal y embudo |
+| RNF-023   | Facilidad de Uso | Panel del embudo entendible a primera vista | Un usuario nuevo lo entiende en pocos minutos |
+| RNF-024   | Otro          | Datos de demo predefinidos | El sistema se presenta sin integración real |
+| RNF-025   | Otro          | Restablecer datos de demo a su estado original | La demo se puede repetir desde cero |
+| RNF-026   | Otro          | App móvil como alcance futuro | El MVP se desarrolla en web de escritorio |
 
-### Capacidad
-
-* El sistema debe soportar un volumen grande de datos (más de 100.000 registros de contactos).
-* La pantalla del embudo debe poder mostrar el resumen de los datos sin demoras perceptibles.
-* El sistema debe poder mostrar los datos de demo y los datos sincronizados de Meta al mismo tiempo.
-
-### Compatibilidad
-
-* Funciona en web de escritorio sobre los navegadores modernos más usados: Chrome, Edge y Firefox.
-* La interfaz debe verse correctamente en resoluciones de pantalla habituales de escritorio y de proyector (para presentaciones).
-
-### Confiabilidad 
-
-* El sistema debe mantener la disponibilidad de los datos durante la demo.
-* La sincronización con Meta debe manejar fallos de conexión sin perder información: si la conexión falla, se conserva la última sincronización y se intenta de nuevo en la siguiente pasada.
-* Si el sistema no puede conectarse con Meta, los dashboards siguen mostrando los datos guardados.
-
-### Escabilidad
-
-* Preparado para crecer en número de usuarios y registros.
-* Arquitectura que permita agregar integraciones y dashboards a futuro.
-* Debe permitir sumar nuevos canales y nuevas métricas sin rediseñar las pantallas existentes.
-
-### Mantenibilidad
-
-* Código modular que permita agregar funcionalidades sin afectar las existentes.
-* Documentación clara para el equipo de desarrollo.
-* La configuración de la conexión con Meta (credenciales e intervalo de sincronización) debe poder ajustarse sin cambiar el código.
-
-### Facilidad de Uso
-
-* Interfaz clara para que los equipos de marketing entiendan el recorrido del usuario.
-* Dashboards visuales que permitan tomar decisiones sin conocimientos técnicos.
-* Los términos usados en pantalla deben ser de marketing (campaña, canal, embudo, conversión), no técnicos.
-* Un usuario nuevo debería poder entender el panel del embudo en los primeros minutos sin ayuda.
-
-### Otro 
-
-* Datos de demo predefinidos para presentar el sistema sin integración real.
-* App móvil contemplada como alcance futuro; el MVP se desarrolla en web de escritorio.
-* El sistema debe permitir restablecer los datos de demo a su estado original para repetir la presentación.
+</div>
 
 
 #### Definiciones y acronimos 
