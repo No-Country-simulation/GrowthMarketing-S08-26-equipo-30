@@ -52,43 +52,43 @@ el análisis de adquisición, activación, conversión y retención.
 |           |                           |                  |                         |
 
 </div> 
-#Requisitos de la interfaz de usuario
+# Requisitos de la interfaz de usuario
 
 
 
-##Requisitos de la interfaz de Hardware
+## Requisitos de la interfaz de Hardware
 
 
-##Requisitos de la Interfaz de software
+## Requisitos de la Interfaz de software
 
 
-##Requisitos de la interfaz de comunicacion 
+## Requisitos de la interfaz de comunicacion 
 
 
-#Requisitos No funcionales
+# Requisitos No funcionales
 
-##Seguridad
-
-
-##Capacidad
+## Seguridad
 
 
-##Compatibilidad
+## Capacidad
 
 
-##Confiabilidad 
+## Compatibilidad
 
 
-##Escabilidad
+## Confiabilidad 
 
 
-##Mantenibilidad
+## Escabilidad
 
 
-##Facilidad de Uso
+## Mantenibilidad
 
 
-##Otro 
+## Facilidad de Uso
+
+
+## Otro 
 
 
 ### Definiciones y acronimos 
