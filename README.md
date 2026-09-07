@@ -52,6 +52,7 @@ el análisis de adquisición, activación, conversión y retención.
 |           |                           |                  |                         |
 
 </div> 
+
 # Requisitos de la interfaz de usuario
 
 
