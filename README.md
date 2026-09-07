@@ -40,6 +40,25 @@ el análisis de adquisición, activación, conversión y retención.
 |                         |                                       | 
 </div>
 
+## Restricciones y supuestos
+
+Estas son las condiciones que limitan el proyecto y las cosas que damos por sentado
+para poder entregar el MVP en 3 semanas.
+
+### Restricciones
+
+* El MVP se desarrolla en **web de escritorio**. La app móvil queda para una siguiente etapa.
+* La integración real con Meta se hace usando **sandbox**, porque no se cuenta con una cuenta real de empresa para la demo.
+* El sistema usa **datos de demo predefinidos** para la presentación, además de lo que se sincronice con Meta.
+* Las etapas del funnel son **fijas** en el MVP. Cada empresa usará las mismas etapas.
+
+### Supuestos
+
+* Los usuarios del sistema son personas de marketing con acceso a internet y un navegador moderno.
+* El equipo que usa GrowthHub tiene claras las definiciones de campaña, canal, funnel y experimento.
+* Para la integración con Meta se contará con credenciales de sandbox disponibles durante el desarrollo.
+* Los eventos que hacen avanzar a un usuario de etapa serán enviados o registrados de forma confiable.
+
 ## Actores del sistema
 
 <div align="center">
@@ -293,25 +312,46 @@ entendiendo que no siempre gana el canal que más vende, sino el que trae client
 
 ---
 
+## Información que guarda el sistema
+
+Esta tabla muestra los datos principales que GrowthHub maneja. No es un modelo
+técnico, sino una guía para entender qué información se guarda y cómo se relaciona.
+
+| Elemento    | Información que guarda                                      | Se relaciona con |
+|:------------|:------------------------------------------------------------|:-----------------|
+| Usuario     | Etapa del funnel, canal por el que llegó, fecha de registro | Campaña, Segmento |
+| Canal       | Nombre, tipo, costo, fechas de uso                          | Campaña, Métrica |
+| Campaña     | Nombre, objetivo, presupuesto, fechas, canales asociados    | Canal, Experimento |
+| Experimento | Variantes A/B, métrica objetivo, fechas, ganador            | Campaña |
+| Métrica     | Alcance, impresiones, clics, conversiones, costo            | Canal, Campaña |
+| Segmento    | Etapa del funnel + canal de adquisición                     | Usuario |
+
+---
+
 <div align="center">
   
 ## Requisitos Funcionales 
 
-|ID         |DESCRIPCION DEL REQUISITO  | DATOS DE ENTRADA | CRITERIOS DE ACEPTACION |
-|:----------|:--------------------------|:-----------------|:------------------------|
-| RF-001    | El sistema debe permitir registrar y consultar canales de adquisición | Nombre, tipo, costo, fechas | Se puede crear y listar canales con sus datos |
-| RF-002    | El sistema debe registrar campañas y asociarlas a uno o varios canales | Nombre, objetivo, presupuesto, fechas, canales | Una campaña se crea con al menos un canal asociado |
-| RF-003    | El sistema debe modelar el recorrido de usuarios en etapas fijas del funnel | Usuario, evento, etapa actual | Cada usuario tiene una etapa actual dentro del funnel |
-| RF-004    | El sistema debe avanzar automáticamente al usuario de etapa al detectar eventos | Eventos de registro, activación, compra | El usuario cambia de etapa sin intervención manual |
-| RF-005    | El sistema debe integrarse con la API de Meta para consultar métricas | Credenciales de sandbox de Meta | Se obtienen alcance, impresiones, clics, conversiones y costo |
-| RF-006    | El sistema debe sincronizar automáticamente las métricas de Meta cada 15 minutos | Métricas obtenidas de la API | Los datos se actualizan en el intervalo definido |
-| RF-007    | El sistema debe mostrar dashboards de funnel, campañas y experimentos | Datos de usuarios, campañas y experimentos | Cada dashboard muestra la información correspondiente |
-| RF-008    | El sistema debe permitir crear experimentos A/B de campañas con métrica objetivo | Campañas variantes A/B, métrica objetivo | Se comparan variantes y se indica la ganadora |
-| RF-009    | El sistema debe generar segmentos automáticos por etapa y canal | Etapa del funnel y canal del usuario | Los segmentos se listan y consultan |
-| RF-010    | El sistema debe contar con datos de demo predefinidos | Datos de ejemplo cargados | Se visualizan dashboards con datos sin integración real |
-| RF-011    | El sistema debe gestionar usuarios con roles y permisos | Usuario, rol, credenciales | Cada rol accede solo a las funciones asignadas |
-| RF-012    | El sistema debe detectar puntos de fuga en el funnel | Tasas de conversión entre etapas | Se identifica la etapa con mayor caída |
-|           |                           |                  |                         |
+La prioridad indica qué tan indispensable es cada requisito para el MVP:
+
+* **Must**: imprescindible. Sin esto, el sistema no cumple su objetivo.
+* **Should**: importante, pero el MVP puede funcionar si se simplifica.
+* **Could**: deseable, se incluye si hay tiempo.
+
+|ID         |DESCRIPCION DEL REQUISITO  | DATOS DE ENTRADA | CRITERIOS DE ACEPTACION | PRIORIDAD |
+|:----------|:--------------------------|:-----------------|:------------------------|:----------|
+| RF-001    | El sistema debe permitir registrar y consultar canales de adquisición | Nombre, tipo, costo, fechas | Se puede crear y listar canales con sus datos | Must |
+| RF-002    | El sistema debe registrar campañas y asociarlas a uno o varios canales | Nombre, objetivo, presupuesto, fechas, canales | Una campaña se crea con al menos un canal asociado | Must |
+| RF-003    | El sistema debe modelar el recorrido de usuarios en etapas fijas del funnel | Usuario, evento, etapa actual | Cada usuario tiene una etapa actual dentro del funnel | Must |
+| RF-004    | El sistema debe avanzar automáticamente al usuario de etapa al detectar eventos | Eventos de registro, activación, compra | El usuario cambia de etapa sin intervención manual | Must |
+| RF-005    | El sistema debe integrarse con la API de Meta para consultar métricas | Credenciales de sandbox de Meta | Se obtienen alcance, impresiones, clics, conversiones y costo | Should |
+| RF-006    | El sistema debe sincronizar automáticamente las métricas de Meta cada 15 minutos | Métricas obtenidas de la API | Los datos se actualizan en el intervalo definido | Should |
+| RF-007    | El sistema debe mostrar dashboards de funnel, campañas y experimentos | Datos de usuarios, campañas y experimentos | Cada dashboard muestra la información correspondiente | Must |
+| RF-008    | El sistema debe permitir crear experimentos A/B de campañas con métrica objetivo | Campañas variantes A/B, métrica objetivo | Se comparan variantes y se indica la ganadora | Must |
+| RF-009    | El sistema debe generar segmentos automáticos por etapa y canal | Etapa del funnel y canal del usuario | Los segmentos se listan y consultan | Should |
+| RF-010    | El sistema debe contar con datos de demo predefinidos | Datos de ejemplo cargados | Se visualizan dashboards con datos sin integración real | Must |
+| RF-011    | El sistema debe gestionar usuarios con roles y permisos | Usuario, rol, credenciales | Cada rol accede solo a las funciones asignadas | Must |
+| RF-012    | El sistema debe detectar puntos de fuga en el funnel | Tasas de conversión entre etapas | Se identifica la etapa con mayor caída | Should |
 
 </div> 
 
@@ -351,13 +391,13 @@ entendiendo que no siempre gana el canal que más vende, sino el que trae client
 | RNF-004   | Seguridad      | Los tokens de la API de Meta se guardan de forma segura | Los tokens no se muestran en pantalla |
 | RNF-005   | Seguridad      | Cierre de sesión por inactividad | La sesión se cierra tras 30 minutos sin actividad |
 | RNF-006   | Seguridad      | Cumplimiento de normativas de protección de datos | Se respetan las normas de datos personales |
-| RNF-007   | Capacidad     | Soporte de un volumen grande de datos | Maneja más de 100.000 registros de contactos |
-| RNF-008   | Capacidad     | El embudo muestra el resumen sin demoras perceptibles | La pantalla carga el resumen al instante |
+| RNF-007   | Capacidad     | Soporte de un volumen grande de datos | Maneja más de 100.000 registros de contactos sin fallos |
+| RNF-008   | Capacidad     | El embudo muestra el resumen sin demoras perceptibles | El dashboard carga en menos de 3 segundos |
 | RNF-009   | Capacidad     | Muestra datos de demo y datos de Meta al mismo tiempo | Ambos tipos de datos se visualizan juntos |
 | RNF-010   | Compatibilidad | Funciona en web de escritorio | Se usa en Chrome, Edge y Firefox |
 | RNF-011   | Compatibilidad | Se ve correctamente en distintas resoluciones | Se ve bien en escritorio y en proyector |
-| RNF-012   | Confiabilidad  | Disponibilidad de los datos durante la demo | Los datos están disponibles al presentar |
-| RNF-013   | Confiabilidad  | Manejo de fallos de conexión con Meta | Si falla, se conserva la última sincronización |
+| RNF-012   | Confiabilidad  | Disponibilidad de los datos durante la demo | Los datos se muestran correctamente en toda la presentación |
+| RNF-013   | Confiabilidad  | Manejo de fallos de conexión con Meta | Si falla una sincronización, se conserva la última y se reintenta en el siguiente ciclo |
 | RNF-014   | Confiabilidad  | Los dashboards funcionan sin conexión a Meta | Muestran los datos guardados aunque Meta no responda |
 | RNF-015   | Escabilidad    | Preparado para crecer en usuarios y registros | Admite más usuarios sin cambios de estructura |
 | RNF-016   | Escabilidad    | Permite agregar integraciones y dashboards a futuro | Se suman nuevos canales y métricas sin rediseñar |
@@ -367,7 +407,7 @@ entendiendo que no siempre gana el canal que más vende, sino el que trae client
 | RNF-020   | Facilidad de Uso | Interfaz clara para equipos de marketing | Se entiende el recorrido del usuario |
 | RNF-021   | Facilidad de Uso | Dashboards visuales sin conocimientos técnicos | Se toman decisiones solo mirando los paneles |
 | RNF-022   | Facilidad de Uso | Términos de marketing, no técnicos | Se usan palabras como campaña, canal y embudo |
-| RNF-023   | Facilidad de Uso | Panel del embudo entendible a primera vista | Un usuario nuevo lo entiende en pocos minutos |
+| RNF-023   | Facilidad de Uso | Panel del embudo entendible a primera vista | Un usuario nuevo entiende el embudo en menos de 5 minutos sin explicación técnica |
 | RNF-024   | Otro          | Datos de demo predefinidos | El sistema se presenta sin integración real |
 | RNF-025   | Otro          | Restablecer datos de demo a su estado original | La demo se puede repetir desde cero |
 | RNF-026   | Otro          | App móvil como alcance futuro | El MVP se desarrolla en web de escritorio |
@@ -386,3 +426,11 @@ entendiendo que no siempre gana el canal que más vende, sino el que trae client
 * **Sandbox**: entorno de prueba de la API de Meta para desarrollar la integración sin una cuenta real.
 * **Growth**: estrategias orientadas a la adquisición, activación, conversión y retención de usuarios.
 * **SRS**: Software Requirements Specification / Especificación de Requisitos de Software.
+
+## Historial de cambios
+
+| Versión | Fecha       | Cambios realizados |
+|:--------|:------------|:-------------------|
+| 1.0     | 2026-09-07  | Estructura inicial del SRS con alcance, requisitos funcionales y no funcionales. |
+| 1.1     | 2026-09-07  | Se agregaron actores, funnel, campañas, canales, segmentos, experimentos, casos de uso y casos de estudio. |
+| 1.2     | 2026-09-07  | Se agregaron restricciones y supuestos, prioridad MoSCoW, modelo de datos simple e historial de cambios. Se hicieron los requisitos no funcionales más medibles. |
