@@ -40,7 +40,10 @@ el análisis de adquisición, activación, conversión y retención.
 |                         |                                       | 
 </div>
 
-#Requisitos Funcionales 
+<div align="center">
+  
+# Requisitos Funcionales 
+
 |ID         |DESCRIPCION DEL REQUISITO  | DATOS DE ENTRADA | CRITERIOS DE ACEPTACION |
 |:----------|:--------------------------|:-----------------|:------------------------|
 | RF-001    |                           |                  |                         |   
@@ -48,7 +51,7 @@ el análisis de adquisición, activación, conversión y retención.
 |           |                           |                  |                         |
 |           |                           |                  |                         |
 
-
+</div> 
 #Requisitos de la interfaz de usuario
 
 
