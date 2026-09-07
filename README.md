@@ -132,6 +132,102 @@ determinar cuál genera mejores resultados. Al crear un experimento se seleccion
 * Métricas consultadas de Meta: alcance, impresiones, clics en enlace, conversiones/registros y costo por resultado.
 * La sincronización con Meta es automática cada 15 minutos.
 
+## Reglas de negocio
+
+Estas reglas responden las preguntas frecuentes de uso del sistema, para que el
+comportamiento sea predecible y no dependa de interpretaciones.
+
+### Sobre campañas
+
+* El nombre de una campaña debe ser único. Si ya existe una campaña con ese nombre, el sistema avisa y no la guarda.
+* No se puede eliminar una campaña que tiene un experimento activo. Primero hay que terminar o cancelar el experimento.
+* Una campaña registrada se puede editar, pero su historial de métricas se conserva.
+
+### Sobre experimentos
+
+* Un experimento solo lo puede crear y activar el Growth Manager.
+* Antes de activarse, el experimento debe tener: dos variantes, una métrica objetivo y una fecha de inicio.
+* Un experimento dura como mínimo 7 días. Antes de ese plazo no se puede declarar un ganador, aunque una variante parezca mejor.
+* El ganador se declara solo al finalizar el experimento, según la métrica objetivo elegida al crearlo.
+* Si al finalizar no hay una diferencia clara entre las variantes, el experimento se marca como "sin ganador" y se guarda como aprendizaje.
+* No se puede editar la métrica objetivo ni las variantes de un experimento activo. Si se necesita cambiar algo, se cancela y se crea uno nuevo.
+
+### Sobre usuarios y segmentos
+
+* Cada usuario tiene una sola etapa actual del funnel. Al completar una acción, avanza automáticamente.
+* Los segmentos se generan automáticamente y no se pueden eliminar. Se actualizan cada vez que llegan datos nuevos.
+* Un usuario puede aparecer en varios segmentos, porque puede estar en una etapa y haber llegado por un canal determinado.
+
+### Sobre datos
+
+* Si la sincronización con Meta falla, los dashboards siguen mostrando los últimos datos disponibles y se reintenta en el siguiente ciclo.
+* Los datos de demo se pueden restablecer a su estado original en cualquier momento, para repetir la presentación.
+
+## Pantallas y su contenido
+
+Esta sección describe qué muestra cada pantalla, quién la usa y en qué situaciones
+puede encontrarse (con datos, sin datos, cargando o con error). Es la guía para el
+diseño de la interfaz.
+
+### Pantalla 1: Panel del funnel
+
+**Quién la usa:** Growth Manager y Analyst.
+
+**Qué muestra:**
+
+* Las 6 etapas del funnel con la cantidad de usuarios en cada una.
+* El porcentaje de usuarios que pasa de una etapa a la siguiente.
+* La etapa con mayor caída (punto de fuga), destacada visualmente.
+* Los segmentos por canal dentro de cada etapa.
+* Filtro por canal y por rango de fechas.
+
+**Estados:**
+
+* *Cargando:* se muestra un indicador mientras llegan los datos.
+* *Sin datos:* se muestra un mensaje que explica que aún no hay información y sugiere revisar las campañas registradas.
+* *Con error:* se muestran los últimos datos disponibles con un aviso de que la actualización falló.
+
+### Pantalla 2: Panel de campañas
+
+**Quién la usa:** Campaign Manager y Growth Manager.
+
+**Qué muestra:**
+
+* Lista de campañas registradas con nombre, objetivo, presupuesto, fechas y canales.
+* Métricas de cada campaña: alcance, impresiones, clics, conversiones y costo por resultado.
+* Comparativa entre campañas para ver cuál genera mejores resultados.
+* Botón para registrar una campaña nueva.
+
+**Estados:**
+
+* *Cargando:* indicador mientras llegan los datos.
+* *Sin datos:* mensaje que invita a registrar la primera campaña.
+* *Con error:* se muestran los datos guardados con aviso de fallo de sincronización.
+
+### Pantalla 3: Panel de experimentos
+
+**Quién la usa:** Growth Manager (crea y aprueba) y Analyst (consulta).
+
+**Qué muestra:**
+
+* Lista de experimentos con su estado: borrador, activo, terminado o cancelado.
+* Para cada experimento: las variantes A y B, la métrica objetivo y los días transcurridos.
+* En experimentos terminados: la variante ganadora o la marca de "sin ganador".
+* En experimentos activos: comparación actual de variantes, con aviso de cuántos días faltan para el mínimo de 7 días.
+
+**Estados:**
+
+* *Cargando:* indicador mientras llegan los datos.
+* *Sin datos:* mensaje que invita a crear el primer experimento.
+* *Con error:* se muestran los datos guardados con aviso de fallo.
+
+### Reglas generales de la interfaz
+
+* Si el usuario no tiene permiso para una acción (por ejemplo, un Analyst intentando crear un experimento), el botón correspondiente no se muestra.
+* Los números se muestran redondeados y con formato legible (por ejemplo, 10.000 en vez de 10000).
+* Los términos en pantalla son de marketing (campaña, canal, embudo, conversión), no técnicos.
+* Toda acción que modifique datos (registrar campaña, activar experimento) muestra una confirmación antes de guardar.
+
 ## Casos de uso
 
 A continuación se muestran las acciones principales que cada persona del equipo
@@ -443,9 +539,11 @@ La prioridad indica qué tan indispensable es cada requisito para el MVP:
 | RNF-021   | Facilidad de Uso | Dashboards visuales sin conocimientos técnicos | Se toman decisiones solo mirando los paneles |
 | RNF-022   | Facilidad de Uso | Términos de marketing, no técnicos | Se usan palabras como campaña, canal y embudo |
 | RNF-023   | Facilidad de Uso | Panel del embudo entendible a primera vista | Un usuario nuevo entiende el embudo en menos de 5 minutos sin explicación técnica |
-| RNF-024   | Otro          | Datos de demo predefinidos | El sistema se presenta sin integración real |
-| RNF-025   | Otro          | Restablecer datos de demo a su estado original | La demo se puede repetir desde cero |
-| RNF-026   | Otro          | App móvil como alcance futuro | El MVP se desarrolla en web de escritorio |
+| RNF-024   | Facilidad de Uso | Cada pantalla muestra su estado actual | Toda pantalla tiene versión de carga, sin datos y con error |
+| RNF-025   | Facilidad de Uso | Las acciones sin permiso no se muestran | Un usuario no ve botones que no puede usar |
+| RNF-026   | Otro          | Datos de demo predefinidos | El sistema se presenta sin integración real |
+| RNF-027   | Otro          | Restablecer datos de demo a su estado original | La demo se puede repetir desde cero |
+| RNF-028   | Otro          | App móvil como alcance futuro | El MVP se desarrolla en web de escritorio |
 
 </div>
 
@@ -456,7 +554,7 @@ La prioridad indica qué tan indispensable es cada requisito para el MVP:
 * **Campaña**: iniciativa con objetivo, fechas y presupuesto que puede ejecutarse en uno o varios canales. Se crea y se publica en la plataforma externa (Meta Ads, Google Ads, etc.) y en GrowthHub solo se registra para su análisis.
 * **Funnel**: recorrido del usuario por las etapas de Visita, Registro, Activación, Interacción, Conversión y Retención.
 * **Segmento**: agrupación de usuarios según la etapa del funnel y el canal de adquisición.
-* **Experimento A/B**: comparación de dos variantes de una campaña para determinar cuál genera mejores resultados.
+* **Experimento A/B**: comparación de dos variantes de una campaña para determinar cuál genera mejores resultados. Dura como mínimo 7 días y el ganador se declara solo al finalizar, según la métrica objetivo elegida.
 * **Punto de fuga**: etapa del funnel donde se pierde una cantidad significativa de usuarios.
 * **Sandbox**: entorno de prueba de la API de Meta para desarrollar la integración sin una cuenta real.
 * **Growth**: estrategias orientadas a la adquisición, activación, conversión y retención de usuarios.
@@ -471,3 +569,4 @@ La prioridad indica qué tan indispensable es cada requisito para el MVP:
 | 1.2     | 2026-09-07  | Se agregaron restricciones y supuestos, prioridad MoSCoW, modelo de datos simple e historial de cambios. Se hicieron los requisitos no funcionales más medibles. |
 | 1.3     | 2026-09-07  | Se corrigió una contradicción de alcance: GrowthHub registra y analiza campañas, pero no crea las campañas publicitarias (eso se hace en plataformas externas). |
 | 1.4     | 2026-09-07  | Se agregó la sección de criterio de éxito del proyecto. |
+| 1.5     | 2026-09-07  | Se agregaron reglas de negocio (campañas, experimentos, usuarios, datos) y la descripción detallada de pantallas con sus estados (carga, sin datos, error), pensada como guía para el diseño de la interfaz. |
