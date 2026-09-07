@@ -30,14 +30,14 @@ el análisis de adquisición, activación, conversión y retención.
 
 <div align="center">
 
-| Dentro                  | Fuera                                 |
-|:------------------------|:--------------------------------------|
-| Analizar campañas       | crear campañas publicitarias externas |
-| Ver funnel              | reemplazar Google Ads o Meta Ads      |
-| Medir experimentos      | garantizar aumento de ventas          |
-| Segmentar usuarios      | Ser un CRM completo                   |
-| detectar puntos de fuga | Automatizar todo el marketing         | 
-|                         |                                       | 
+| Dentro                          | Fuera                                                       |
+|:--------------------------------|:------------------------------------------------------------|
+| Registrar y analizar campañas   | Crear campañas publicitarias en plataformas externas        |
+| Ver funnel                      | reemplazar Google Ads o Meta Ads                            |
+| Medir experimentos              | garantizar aumento de ventas                                |
+| Segmentar usuarios              | Ser un CRM completo                                         |
+| detectar puntos de fuga         | Automatizar todo el marketing                               |
+|                                 |                                                             | 
 </div>
 
 ## Restricciones y supuestos
@@ -66,7 +66,7 @@ para poder entregar el MVP en 3 semanas.
 | Rol                | Responsabilidades                                                              |
 |:-------------------|:------------------------------------------------------------------------------|
 | Growth Manager     | Define el funnel, aprueba experimentos y revisa métricas globales.              |
-| Campaign Manager   | Crea campañas, asigna canales y configura segmentos.                           |
+| Campaign Manager   | Registra campañas, asigna canales y configura segmentos.                      |
 | Analyst            | Consulta métricas, compara campañas e identifica puntos de fuga.               |
 </div>
 
@@ -92,6 +92,10 @@ avanza automáticamente de una etapa a la siguiente cuando el sistema detecta un
 Una campaña es una iniciativa con objetivo, fechas y presupuesto que puede ejecutarse
 en uno o varios canales. Un canal es el medio por el cual se comunica la empresa
 (Instagram, Facebook, Google Ads, Email, Referidos, etc.).
+
+**Importante:** la campaña publicitaria se crea y se publica en la plataforma externa
+correspondiente (por ejemplo, Meta Ads o Google Ads). En GrowthHub la campaña solo se
+**registra** con sus datos básicos, para poder analizar sus resultados junto al funnel.
 
 | Campaña             | Canales asociados                  | Objetivo      |
 |:--------------------|:-----------------------------------|:--------------|
@@ -158,32 +162,35 @@ flowchart TD
 
 ---
 
-### Caso de uso 2: Crear una campaña
+### Caso de uso 2: Registrar una campaña
 
 **Quién lo usa:** Campaign Manager.
 
-**Para qué sirve:** registrar una campaña y elegir los canales donde se va a mostrar,
-para después poder comparar resultados.
+**Para qué sirve:** anotar en GrowthHub los datos de una campaña que ya se publicó en
+una plataforma externa (por ejemplo, Meta Ads), para poder analizar sus resultados.
+La campaña publicitaria se crea en la plataforma externa, no dentro de GrowthHub.
 
 ```mermaid
 flowchart TD
-    A([El usuario ingresa a GrowthHub]) --> B[Elige la opción Nueva campaña]
+    A([El usuario ingresa a GrowthHub]) --> B[Elige la opción Registrar campaña]
     B --> C[Completa nombre, objetivo y presupuesto]
-    C --> D[Selecciona los canales de la campaña]
-    D --> E{¿Eligió al menos un canal?}
-    E -->|Sí| F[Se guarda la campaña]
-    E -->|No| G[Se muestra aviso: falta elegir canal]
+    C --> D[Indica en qué canales externos se publicó]
+    D --> E{¿Indicó al menos un canal?}
+    E -->|Sí| F[Se guarda la campaña registrada]
+    E -->|No| G[Se muestra aviso: falta indicar canal]
     G --> D
     F --> H[La campaña aparece en el panel de campañas]
+    H --> I[Desde ahí se leen las métricas que llegan de las plataformas]
 ```
 
 **Qué hace el sistema paso a paso:**
 
-1. La persona crea una nueva campaña.
-2. Completa el nombre, el objetivo y el presupuesto.
-3. Elige uno o varios canales (Instagram, Facebook, Google Ads, Email, etc.).
-4. Si no eligió ningún canal, el sistema le avisa para que lo complete.
-5. Cuando la campaña tiene al menos un canal, se guarda y aparece en el panel de campañas.
+1. La persona crea la campaña publicitaria en la plataforma externa, como Meta Ads.
+2. Luego entra a GrowthHub y registra esa campaña con su nombre, objetivo y presupuesto.
+3. Indica en qué canales externos se publicó (Instagram, Facebook, Google Ads, Email, etc.).
+4. Si no indicó ningún canal, el sistema le avisa para que lo complete.
+5. Cuando la campaña registrada tiene al menos un canal, se guarda y aparece en el panel de campañas.
+6. A partir de ese registro, el sistema puede mostrar las métricas que llegan de las plataformas.
 
 ---
 
@@ -341,7 +348,7 @@ La prioridad indica qué tan indispensable es cada requisito para el MVP:
 |ID         |DESCRIPCION DEL REQUISITO  | DATOS DE ENTRADA | CRITERIOS DE ACEPTACION | PRIORIDAD |
 |:----------|:--------------------------|:-----------------|:------------------------|:----------|
 | RF-001    | El sistema debe permitir registrar y consultar canales de adquisición | Nombre, tipo, costo, fechas | Se puede crear y listar canales con sus datos | Must |
-| RF-002    | El sistema debe registrar campañas y asociarlas a uno o varios canales | Nombre, objetivo, presupuesto, fechas, canales | Una campaña se crea con al menos un canal asociado | Must |
+| RF-002    | El sistema debe registrar campañas y asociarlas a uno o varios canales | Nombre, objetivo, presupuesto, fechas, canales | Una campaña se registra con al menos un canal asociado | Must |
 | RF-003    | El sistema debe modelar el recorrido de usuarios en etapas fijas del funnel | Usuario, evento, etapa actual | Cada usuario tiene una etapa actual dentro del funnel | Must |
 | RF-004    | El sistema debe avanzar automáticamente al usuario de etapa al detectar eventos | Eventos de registro, activación, compra | El usuario cambia de etapa sin intervención manual | Must |
 | RF-005    | El sistema debe integrarse con la API de Meta para consultar métricas | Credenciales de sandbox de Meta | Se obtienen alcance, impresiones, clics, conversiones y costo | Should |
@@ -418,7 +425,7 @@ La prioridad indica qué tan indispensable es cada requisito para el MVP:
 #### Definiciones y acronimos 
 
 * **Canal**: medio por el cual la empresa se comunica con la audiencia (Instagram, Facebook, Google Ads, Email, Referidos, etc.).
-* **Campaña**: iniciativa con objetivo, fechas y presupuesto que puede ejecutarse en uno o varios canales.
+* **Campaña**: iniciativa con objetivo, fechas y presupuesto que puede ejecutarse en uno o varios canales. Se crea y se publica en la plataforma externa (Meta Ads, Google Ads, etc.) y en GrowthHub solo se registra para su análisis.
 * **Funnel**: recorrido del usuario por las etapas de Visita, Registro, Activación, Interacción, Conversión y Retención.
 * **Segmento**: agrupación de usuarios según la etapa del funnel y el canal de adquisición.
 * **Experimento A/B**: comparación de dos variantes de una campaña para determinar cuál genera mejores resultados.
@@ -434,3 +441,4 @@ La prioridad indica qué tan indispensable es cada requisito para el MVP:
 | 1.0     | 2026-09-07  | Estructura inicial del SRS con alcance, requisitos funcionales y no funcionales. |
 | 1.1     | 2026-09-07  | Se agregaron actores, funnel, campañas, canales, segmentos, experimentos, casos de uso y casos de estudio. |
 | 1.2     | 2026-09-07  | Se agregaron restricciones y supuestos, prioridad MoSCoW, modelo de datos simple e historial de cambios. Se hicieron los requisitos no funcionales más medibles. |
+| 1.3     | 2026-09-07  | Se corrigió una contradicción de alcance: GrowthHub registra y analiza campañas, pero no crea las campañas publicitarias (eso se hace en plataformas externas). |
