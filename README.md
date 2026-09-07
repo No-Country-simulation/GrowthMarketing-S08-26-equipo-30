@@ -223,6 +223,76 @@ flowchart TD
 
 ---
 
+## Casos de estudio
+
+Los casos de estudio son ejemplos concretos de cómo un equipo de marketing usaría
+GrowthHub en su día a día. Ayudan a entender el valor del sistema en situaciones reales.
+
+### Caso de estudio 1: ¿Dónde perdemos a los clientes?
+
+**Empresa:** una tienda de ropa online.
+
+**Situación:** el equipo invierte en Instagram, Google Ads y email marketing, pero no sabe
+en qué punto del recorrido se pierden los clientes. Solo miran cuántas visitas genera cada canal.
+
+**Problema:** Instagram genera muchas visitas, pero muy pocas ventas. El equipo cree que
+Instagram es el mejor canal porque trae más gente, y por eso le destina más presupuesto.
+
+**Qué hace el equipo con GrowthHub:**
+
+1. Abren el panel del embudo.
+2. Ven que de 10.000 visitas de Instagram solo 1.000 se registran, y de esas solo 50 compran.
+3. Comparan con Google Ads: 2.000 visitas, 800 registros y 300 compras.
+4. Descubren que el punto de fuga más grande está entre la Visita y el Registro.
+
+**Resultado:** el equipo detecta que Google Ads convierte mejor que Instagram. Deciden
+revisar la landing page de Instagram y mover parte del presupuesto a Google Ads.
+
+---
+
+### Caso de estudio 2: Probamos si un mensaje corto funciona mejor
+
+**Empresa:** una app de finanzas personales.
+
+**Situación:** el equipo quiere aumentar la cantidad de personas que se registran después
+de ver una campaña en Facebook Ads.
+
+**Problema:** el mensaje actual ("Conoce nuestras funciones") no está convenciendo. No saben
+si un mensaje más corto o uno con oferta funcionaría mejor.
+
+**Qué hace el equipo con GrowthHub:**
+
+1. Crean un experimento A/B con dos variantes de la misma campaña en Facebook Ads.
+2. Variante A: "Conoce nuestras funciones".
+3. Variante B: "Abre tu cuenta gratis en 2 minutos".
+4. Eligen como métrica objetivo la tasa de conversión (registros sobre visitas).
+5. Al terminar el experimento, el sistema muestra que la variante B ganó.
+
+**Resultado:** el equipo aplica el mensaje ganador a toda la campaña y aumenta la cantidad
+de registros, con la certeza de que la decisión se basó en datos y no en una suposición.
+
+---
+
+### Caso de estudio 3: Saber qué canal trae clientes que vuelven
+
+**Empresa:** un servicio de suscripción de comidas.
+
+**Situación:** la empresa quiere retener clientes, no solo conseguirlos.
+
+**Problema:** no saben qué canal trae los clientes más fieles. Piensan que el canal que más
+vende es el mejor, pero no conocen cuáles clientes vuelven a comprar.
+
+**Qué hace el equipo con GrowthHub:**
+
+1. Revisan los segmentos automáticos por etapa y canal.
+2. Ven que los clientes convertidos por Email tienen una alta retención.
+3. Los clientes convertidos por anuncios en redes vuelven menos.
+
+**Resultado:** el equipo decide reforzar la estrategia de email marketing para fidelizar,
+entendiendo que no siempre gana el canal que más vende, sino el que trae clientes que regresan.
+
+---
+
 <div align="center">
   
 ## Requisitos Funcionales 
@@ -274,43 +344,53 @@ flowchart TD
 ### Seguridad
 
 * Autenticación de usuarios con usuario y contraseña.
-* Roles y permisos por tipo de usuario.
+* Roles y permisos por tipo de usuario: Growth Manager, Campaign Manager y Analyst.
 * Encriptación de contraseñas, tokens de API y datos sensibles.
 * Cumplimiento de normativas de protección de datos personales.
+* Los tokens de la API de Meta se guardan de forma segura y no se muestran en pantalla.
+* Sesión de usuario: si no hay actividad durante 30 minutos, se cierra la sesión por seguridad.
 
 ### Capacidad
 
 * El sistema debe soportar un volumen grande de datos (más de 100.000 registros de contactos).
-* Visualización inmediata de los datos disponibles.
+* La pantalla del embudo debe poder mostrar el resumen de los datos sin demoras perceptibles.
+* El sistema debe poder mostrar los datos de demo y los datos sincronizados de Meta al mismo tiempo.
 
 ### Compatibilidad
 
-* Funciona en web de escritorio sobre navegadores modernos.
+* Funciona en web de escritorio sobre los navegadores modernos más usados: Chrome, Edge y Firefox.
+* La interfaz debe verse correctamente en resoluciones de pantalla habituales de escritorio y de proyector (para presentaciones).
 
 ### Confiabilidad 
 
 * El sistema debe mantener la disponibilidad de los datos durante la demo.
-* La sincronización con Meta debe manejar fallos de conexión sin perder información.
+* La sincronización con Meta debe manejar fallos de conexión sin perder información: si la conexión falla, se conserva la última sincronización y se intenta de nuevo en la siguiente pasada.
+* Si el sistema no puede conectarse con Meta, los dashboards siguen mostrando los datos guardados.
 
 ### Escabilidad
 
 * Preparado para crecer en número de usuarios y registros.
 * Arquitectura que permita agregar integraciones y dashboards a futuro.
+* Debe permitir sumar nuevos canales y nuevas métricas sin rediseñar las pantallas existentes.
 
 ### Mantenibilidad
 
 * Código modular que permita agregar funcionalidades sin afectar las existentes.
 * Documentación clara para el equipo de desarrollo.
+* La configuración de la conexión con Meta (credenciales e intervalo de sincronización) debe poder ajustarse sin cambiar el código.
 
 ### Facilidad de Uso
 
 * Interfaz clara para que los equipos de marketing entiendan el recorrido del usuario.
 * Dashboards visuales que permitan tomar decisiones sin conocimientos técnicos.
+* Los términos usados en pantalla deben ser de marketing (campaña, canal, embudo, conversión), no técnicos.
+* Un usuario nuevo debería poder entender el panel del embudo en los primeros minutos sin ayuda.
 
 ### Otro 
 
 * Datos de demo predefinidos para presentar el sistema sin integración real.
 * App móvil contemplada como alcance futuro; el MVP se desarrolla en web de escritorio.
+* El sistema debe permitir restablecer los datos de demo a su estado original para repetir la presentación.
 
 
 #### Definiciones y acronimos 
