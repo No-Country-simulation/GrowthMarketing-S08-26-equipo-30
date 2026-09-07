@@ -39,3 +39,55 @@ el análisis de adquisición, activación, conversión y retención.
 | detectar puntos de fuga | Automatizar todo el marketing         | 
 |                         |                                       | 
 </div>
+
+#Requisitos Funcionales 
+|ID         |DESCRIPCION DEL REQUISITO  | DATOS DE ENTRADA | CRITERIOS DE ACEPTACION |
+|:----------|:--------------------------|:-----------------|:------------------------|
+| RF-001    |                           |                  |                         |   
+|           |                           |                  |                         |
+|           |                           |                  |                         |
+|           |                           |                  |                         |
+
+
+#Requisitos de la interfaz de usuario
+
+
+
+##Requisitos de la interfaz de Hardware
+
+
+##Requisitos de la Interfaz de software
+
+
+##Requisitos de la interfaz de comunicacion 
+
+
+#Requisitos No funcionales
+
+##Seguridad
+
+
+##Capacidad
+
+
+##Compatibilidad
+
+
+##Confiabilidad 
+
+
+##Escabilidad
+
+
+##Mantenibilidad
+
+
+##Facilidad de Uso
+
+
+##Otro 
+
+
+### Definiciones y acronimos 
+
+
