@@ -1,14 +1,14 @@
 ﻿from fastapi import APIRouter, Depends, HTTPException, Request, status
 
-from .constants import ERROR_CAMPAIGN_NOT_FOUND, ERROR_DUPLICATE_NAME
-from .contracts import CampaignRepository
-from .schemas import CampaignCreate, CampaignResponse, CampaignUpdate
-from .service import (
+from backend.repositories.contracts import CampaignRepository
+from backend.schemas.campaigns import CampaignCreate, CampaignResponse, CampaignUpdate
+from backend.services.campaigns import (
     CampaignNotFoundError,
     CampaignService,
     DuplicateCampaignNameError,
     InvalidCampaignError,
 )
+from backend.shared.constants.campaigns import ERROR_CAMPAIGN_NOT_FOUND, ERROR_DUPLICATE_NAME
 
 
 def get_campaign_repository(request: Request) -> CampaignRepository:

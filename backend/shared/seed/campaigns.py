@@ -1,10 +1,12 @@
-import json
+﻿import json
 from pathlib import Path
 
-from .contracts import CampaignRepository
-from .schemas import CampaignSeed
+from backend.repositories.contracts import CampaignRepository
+from backend.schemas.campaigns import CampaignSeed
 
-DEMO_CAMPAIGNS_PATH = Path(__file__).resolve().parent / "data" / "demo_campaigns.json"
+DEMO_CAMPAIGNS_PATH = (
+    Path(__file__).resolve().parent.parent / "data" / "demo_campaigns.json"
+)
 
 
 def load_demo_campaigns() -> list[CampaignSeed]:

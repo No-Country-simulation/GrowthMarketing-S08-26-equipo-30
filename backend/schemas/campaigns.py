@@ -1,8 +1,8 @@
-from datetime import date
+﻿from datetime import date
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-from .constants import (
+from backend.shared.constants.campaigns import (
     ALLOWED_CAMPAIGN_STATUSES,
     CAMPAIGN_STATUS_ACTIVE,
     DEFAULT_METRIC_CLICKS,

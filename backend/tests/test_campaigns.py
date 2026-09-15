@@ -1,11 +1,11 @@
-import pytest
+﻿import pytest
 from fastapi.testclient import TestClient
 
-from app.campaigns.repository import InMemoryCampaignRepository
-from app.campaigns.router import get_campaign_repository
-from app.campaigns.seed import load_demo_campaigns, seed_campaigns
-from app.core.config import get_settings
-from app.main import app
+from backend.app.main import app
+from backend.app.routers.campaigns import get_campaign_repository
+from backend.core.config import get_settings
+from backend.repositories.campaigns import InMemoryCampaignRepository
+from backend.shared.seed.campaigns import load_demo_campaigns, seed_campaigns
 
 client = TestClient(app)
 
@@ -21,7 +21,7 @@ def repository():
 
 def valid_payload(**overrides):
     payload = {
-        "name": "Campaña de prueba",
+        "name": "CampaÃ±a de prueba",
         "objective": "200 registros",
         "budget": 1500.0,
         "start_date": "2026-10-01",
@@ -75,7 +75,7 @@ def test_create_valid_campaign(repository):
     response = client.post("/api/campaigns", json=valid_payload())
     assert response.status_code == 201
     body = response.json()
-    assert body["name"] == "Campaña de prueba"
+    assert body["name"] == "CampaÃ±a de prueba"
     assert body["channels"] == ["Instagram Ads"]
     assert body["status"] == "activa"
     assert body["metrics"]["conversions"] == 0

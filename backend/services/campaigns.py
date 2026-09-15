@@ -1,4 +1,6 @@
-﻿from .constants import (
+﻿from backend.repositories.contracts import CampaignRepository
+from backend.schemas.campaigns import CampaignCreate, CampaignUpdate
+from backend.shared.constants.campaigns import (
     ERROR_BUDGET_NEGATIVE,
     ERROR_CAMPAIGN_NOT_FOUND,
     ERROR_CHANNELS_REQUIRED,
@@ -9,24 +11,22 @@
     MIN_CAMPAIGN_BUDGET,
     MIN_CAMPAIGN_CHANNELS,
 )
-from .contracts import CampaignRepository
-from .schemas import CampaignCreate, CampaignUpdate
 
 
 class CampaignError(Exception):
-    """Error base del modulo de campañas."""
+    """Error base del modulo de campaÃ±as."""
 
 
 class CampaignNotFoundError(CampaignError):
-    """La campaña solicitada no existe."""
+    """La campaÃ±a solicitada no existe."""
 
 
 class DuplicateCampaignNameError(CampaignError):
-    """Ya existe una campaña con el mismo nombre."""
+    """Ya existe una campaÃ±a con el mismo nombre."""
 
 
 class InvalidCampaignError(CampaignError):
-    """Los datos de la campaña no cumplen las reglas de negocio."""
+    """Los datos de la campaÃ±a no cumplen las reglas de negocio."""
 
 
 class CampaignService:
@@ -52,7 +52,10 @@ class CampaignService:
         changes = data.model_dump(exclude_unset=True)
 
         new_name = changes.get("name")
-        if new_name is not None and new_name.strip().lower() != existing["name"].strip().lower():
+        if (
+            new_name is not None
+            and new_name.strip().lower() != existing["name"].strip().lower()
+        ):
             duplicate = self.repository.get_by_name(new_name)
             if duplicate is not None and duplicate["id"] != campaign_id:
                 raise DuplicateCampaignNameError(ERROR_DUPLICATE_NAME)

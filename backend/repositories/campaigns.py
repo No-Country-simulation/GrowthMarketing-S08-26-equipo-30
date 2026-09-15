@@ -1,7 +1,7 @@
-from copy import deepcopy
+﻿from copy import deepcopy
 from uuid import uuid4
 
-from .constants import CAMPAIGN_STATUS_ACTIVE, DEFAULT_CAMPAIGN_METRICS
+from backend.shared.constants.campaigns import CAMPAIGN_STATUS_ACTIVE, DEFAULT_CAMPAIGN_METRICS
 
 
 class InMemoryCampaignRepository:
