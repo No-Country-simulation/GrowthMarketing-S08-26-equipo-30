@@ -445,6 +445,8 @@ a:
 
 ## Información que guarda el sistema
 
+Diseño de la base de datos para el **MVP con un único usuario demo**: [base de datos en DBML](docs/base-de-datos-mvp.dbml). Sus nueve tablas cubren campañas y canales, funnel, historial de métricas y experimentos A/B, con soporte para Meta. Los segmentos se calculan desde los eventos. Para esta versión se omiten login y permisos por rol, aunque aparecen en la visión original de este documento. Los nombres siguen el backend y las explicaciones están en español. Los repositorios SQL y las migraciones aún están pendientes.
+
 Esta tabla muestra los datos principales que GrowthHub maneja. No es un modelo
 técnico, sino una guía para entender qué información se guarda y cómo se relaciona.
 

@@ -1,0 +1,270 @@
+// GrowthHub — MVP con un único usuario demo, sin login ni roles.
+// El usuario demo se configura en la aplicación; no necesita una tabla.
+// funnel_users son las personas analizadas, NO quienes usan GrowthHub.
+// 9 tablas: campañas, funnel y experimentos, con sus datos relacionados.
+// Nombres en inglés para coincidir con el backend; notas en español.
+// Una empresa, una moneda común y fechas/horas en UTC.
+// Esto es un diseño; todavía no implementa migraciones ni repositorios SQL.
+
+// 1. CAMPAÑAS: una campaña tiene varios canales y un historial de métricas.
+
+Table campaigns {
+  id char(32) [pk, note: 'Generado por la aplicación con uuid4().hex, como el repositorio actual.']
+  name text [not null]
+  name_key text [not null, unique, note: 'Campo interno: name.strip().lower(). Mantenerlo en cada escritura.']
+  objective text [not null]
+  budget decimal(18,2) [not null]
+  start_date date [not null]
+  end_date date [not null]
+  status varchar(20) [not null, default: 'activa']
+  is_demo boolean [not null, default: false]
+  archived_at timestamp
+  meta_account_id varchar(100)
+  meta_campaign_id varchar(100)
+  last_sync_attempt_at timestamp
+  last_sync_success_at timestamp
+  last_sync_error text
+
+  indexes {
+    (meta_account_id, meta_campaign_id) [unique]
+  }
+
+  checks {
+    `length(trim(name)) > 0`
+    `length(trim(objective)) > 0`
+    `budget >= 0`
+    `end_date >= start_date`
+    `status IN ('activa', 'pausada', 'finalizada')`
+    `(meta_account_id IS NULL AND meta_campaign_id IS NULL) OR (meta_account_id IS NOT NULL AND meta_campaign_id IS NOT NULL)`
+  }
+
+  Note: 'Campaña registrada en GrowthHub. Archivar permite ocultarla sin borrar su historia. Los campos meta_* son opcionales: una campaña Meta por campaña local en el sandbox; tokens fuera de la BD.'
+}
+
+Table channels {
+  id bigint [pk, increment]
+  name text [not null, unique]
+
+  Note: 'Canales disponibles: Instagram Ads, Google Ads, Email, etc.'
+}
+
+Table campaign_channels {
+  campaign_id char(32) [not null]
+  channel_id bigint [not null]
+  position integer [not null]
+
+  indexes {
+    (campaign_id, channel_id) [pk]
+    (campaign_id, position) [unique]
+    channel_id
+  }
+  checks {
+    `position >= 0`
+  }
+
+  Note: 'Une campañas y canales sin repetir la misma pareja. position conserva el orden de channels en la API. Cada campaña necesita al menos un canal.'
+}
+
+// 2. FUNNEL: una persona tiene eventos que indican las etapas que alcanzó.
+Table funnel_users {
+  id text [pk, note: 'FunnelEventSeed.user_id, por ejemplo u01. No es un usuario de login.']
+  is_demo boolean [not null, default: false]
+
+  Note: 'Persona cuyo recorrido se analiza. La etapa actual se calcula desde sus eventos, sin guardarla por duplicado.'
+}
+
+Table funnel_stages {
+  key varchar(20) [pk]
+  label varchar(30) [not null]
+  position smallint [not null, unique]
+
+  checks {
+    `key IN ('visita', 'registro', 'activacion', 'interaccion', 'conversion', 'retencion')`
+    `position BETWEEN 1 AND 6`
+  }
+
+  Note: 'Las seis etapas fijas del backend. key es el valor de la API; label es el nombre visible; position indica el orden.'
+}
+
+Table funnel_events {
+  id bigint [pk, increment]
+  user_id text [not null]
+  stage varchar(20) [not null]
+  channel_id bigint [not null]
+  campaign_id char(32) [not null]
+  event_date date [not null]
+
+  indexes {
+    (user_id, event_date)
+    (stage, user_id)
+    (channel_id, event_date)
+    campaign_id
+    event_date
+  }
+
+  Note: 'Una acción de una persona, en una etapa, campaña, canal y fecha. Puede haber acciones repetidas; el funnel cuenta personas distintas. Cambiar los canales de una campaña no borra eventos anteriores.'
+}
+
+// 3. MÉTRICAS: cada fila es una fotografía de resultados, no un incremento.
+Table campaign_metrics {
+  id bigint [pk, increment]
+  campaign_id char(32) [not null]
+  captured_at timestamp [not null]
+  period_start date [not null]
+  period_end date [not null]
+  source varchar(20) [not null]
+  reach bigint [not null, default: 0]
+  impressions bigint [not null, default: 0]
+  clicks bigint [not null, default: 0]
+  conversions bigint [not null, default: 0]
+  cost_per_result decimal(18,2) [not null, default: 0]
+
+  indexes {
+    (campaign_id, captured_at) [unique]
+  }
+  checks {
+    `period_end >= period_start`
+    `source IN ('demo', 'manual', 'meta')`
+    `reach >= 0`
+    `impressions >= 0`
+    `clicks >= 0`
+    `conversions >= 0`
+    `cost_per_result >= 0`
+  }
+  Note: 'Resultados de una campaña durante period_start/end, guardados en captured_at. La API muestra el último registro: no sumar registros históricos entre sí. source indica su origen. El costo se recibe de la fuente, no se calcula con el presupuesto.'
+}
+
+// 4. EXPERIMENTOS A/B: campaña -> experimento -> variantes A y B.
+Table experiments {
+  id char(32) [pk]
+  campaign_id char(32) [not null]
+  name text [not null]
+  hypothesis text [not null]
+  target_metric varchar(40) [not null]
+  result_type varchar(20)
+  status varchar(20) [not null, default: 'borrador']
+  started_at timestamp
+  ended_at timestamp
+  winner_code char(1)
+  conclusion text
+
+  indexes {
+    (campaign_id, status)
+  }
+  checks {
+    `length(trim(name)) > 0`
+    `length(trim(hypothesis)) > 0`
+    `status IN ('borrador', 'activo', 'terminado', 'cancelado')`
+    `target_metric IN ('conversion_rate', 'activation_rate', 'customer_conversion_rate', 'cost_per_result')`
+    `(target_metric = 'cost_per_result' AND result_type IS NOT NULL AND result_type IN ('click', 'registration', 'conversion')) OR (target_metric <> 'cost_per_result' AND result_type IS NULL)`
+    `status NOT IN ('activo', 'terminado') OR started_at IS NOT NULL`
+    `(status IN ('terminado', 'cancelado') AND ended_at IS NOT NULL) OR (status IN ('borrador', 'activo') AND ended_at IS NULL)`
+    `ended_at IS NULL OR started_at IS NULL OR ended_at >= started_at`
+    `winner_code IS NULL OR status = 'terminado'`
+    `status <> 'terminado' OR (conclusion IS NOT NULL AND length(trim(conclusion)) > 0)`
+  }
+  Note: 'Prueba A/B de una campaña, gestionada por el usuario demo. winner_code indica A o B; NULL al terminar significa sin ganador. conclusion guarda el aprendizaje. Generar id con uuid4().hex.'
+}
+
+Table experiment_variants {
+  experiment_id char(32) [not null]
+  code char(1) [not null]
+  description text [not null]
+  visits bigint
+  registrations bigint
+  activations bigint
+  conversions bigint
+  clicks bigint
+  spend decimal(18,2)
+  measured_at timestamp
+
+  indexes {
+    (experiment_id, code) [pk]
+  }
+  checks {
+    `code IN ('A', 'B')`
+    `length(trim(description)) > 0`
+    `visits IS NULL OR visits >= 0`
+    `registrations IS NULL OR registrations >= 0`
+    `activations IS NULL OR activations >= 0`
+    `conversions IS NULL OR conversions >= 0`
+    `clicks IS NULL OR clicks >= 0`
+    `spend IS NULL OR spend >= 0`
+    `registrations IS NULL OR visits IS NULL OR registrations <= visits`
+    `activations IS NULL OR registrations IS NULL OR activations <= registrations`
+    `conversions IS NULL OR activations IS NULL OR conversions <= activations`
+  }
+  Note: 'Versiones A y B y sus resultados acumulados. NULL significa sin datos; 0 significa cero medido. Actualizar reemplaza los totales. Comparar personas de la misma cohorte y ventana, sin repetirlas entre A y B; congelar resultados al cerrar. Datos demo o externos, sin motor de asignación aleatoria.'
+}
+
+// FK explícitas. No hay endpoints de borrado: preservar referencias históricas.
+Ref: campaign_channels.campaign_id > campaigns.id [delete: restrict, update: restrict]
+Ref: campaign_channels.channel_id > channels.id [delete: restrict, update: restrict]
+Ref: funnel_events.user_id > funnel_users.id [delete: restrict, update: restrict]
+Ref: funnel_events.stage > funnel_stages.key [delete: restrict, update: restrict]
+Ref: funnel_events.channel_id > channels.id [delete: restrict, update: restrict]
+Ref: funnel_events.campaign_id > campaigns.id [delete: restrict, update: restrict]
+Ref: campaign_metrics.campaign_id > campaigns.id [delete: restrict, update: restrict]
+Ref: experiments.campaign_id > campaigns.id [delete: restrict, update: restrict]
+Ref: experiment_variants.experiment_id > experiments.id [delete: restrict, update: restrict]
+Ref: experiments.(id, winner_code) > experiment_variants.(experiment_id, code) [delete: restrict, update: restrict]
+
+// Grupos visuales para leer el diagrama por módulo.
+TableGroup campanas_y_metricas {
+  campaigns
+  channels
+  campaign_channels
+  campaign_metrics
+}
+
+TableGroup funnel_y_segmentos {
+  funnel_users
+  funnel_stages
+  funnel_events
+}
+
+TableGroup experimentos_ab {
+  experiments
+  experiment_variants
+}
+
+Records funnel_stages(key, label, position) {
+  'visita', 'Visita', 1
+  'registro', 'Registro', 2
+  'activacion', 'Activación', 3
+  'interaccion', 'Interacción', 4
+  'conversion', 'Conversión', 5
+  'retencion', 'Retención', 6
+}
+
+// CONEXIÓN CON EL BACKEND
+// - Mantener routers -> services -> repositories y los contratos actuales.
+// - channels de la API sale de campaign_channels ordenado por position.
+//   Crear/editar campaña y canales juntos; quitar duplicados y exigir al menos uno.
+// - metrics sale del último campaign_metrics; sin registros usar los ceros actuales.
+//   Guardar CampaignSeed.metrics como primer registro con source = demo.
+// - Buscar nombres por name_key (strip + lower); actualizarlo junto con name.
+// - Al importar eventos, resolver campaign_name y channel a sus IDs; al leer,
+//   devolver sus nombres mediante JOIN. Una campaña desconocida debe rechazarse.
+// - El funnel histórico cuenta DISTINCT user_id por etapa, incluidas etapas vacías.
+//   La etapa actual es la mayor position alcanzada. No inventar etapas intermedias.
+
+// REGLAS PARA LOS SERVICIOS
+// - Segmentos: etapa actual + canal del primer evento (event_date, luego id).
+//   Es la propuesta de atribución simple; multicanal queda pendiente de definición.
+// - Meta: sincronizar cada 15 minutos; guardar métricas e instante de éxito juntos.
+//   Ante fallos conservar el último resultado. No guardar fallos como ceros ni
+//   sumar datos Meta con demo/manual: usar una fuente por campaña y su cobertura.
+// - Activar experimentos con A y B, métrica e inicio. Congelar su definición.
+//   Terminar después de 7 días completos; cancelar antes está permitido.
+//   No archivar una campaña con experimentos activos.
+// - Comparar A/B en la misma ventana: registros/visitas, activaciones/registros,
+//   conversiones/activaciones o gasto/resultado elegido. No sumar a campaign_metrics.
+//   Sin datos o con divisor cero, no declarar ganador. El umbral de diferencia
+//   clara no está definido en README: acordarlo antes de automatizar el resultado.
+// - is_demo distingue datos de prueba de datos reales, no identifica al operador.
+//   Eventos heredan esa condición de la persona; métricas/experimentos de campaña.
+//   No mezclar personas demo con campañas reales. Restaurar solo datos demo,
+//   en transacción: limpiar winner_code, borrar dependencias y volver a cargar seeds.
+// - Crear las restricciones en la migración. Un usuario demo no requiere contraseñas
+//   ni permisos por rol; esta decisión reemplaza el control de roles del README.
