@@ -5,7 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Check;
-
+//tabla intermedia. une campaña específica con un canal específico y,
+// además, guarda la posición que tiene ese canal dentro de la campaña.
 @Entity
 @Table(
         name = "campaign_channels",
