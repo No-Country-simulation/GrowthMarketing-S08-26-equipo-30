@@ -54,12 +54,6 @@ public class EventService {
 		Channel channel = channelRepository.findByNameIgnoreCase(request.channelName().trim())
 				.orElseThrow(() -> new NotFoundException("Canal no encontrado"));
 
-		boolean belongsToCampaign = campaign.getChannels().stream()
-				.anyMatch(assigned -> assigned.getId().equals(channel.getId()));
-		if (!belongsToCampaign) {
-			throw new BadRequestException("El canal no pertenece a la campaña");
-		}
-
 		String userId = request.userId().trim();
 		User user = userRepository.findById(userId).orElseGet(() -> {
 			User created = new User();

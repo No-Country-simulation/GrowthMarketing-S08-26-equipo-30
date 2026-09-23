@@ -121,18 +121,18 @@ class EventServiceTest {
 	}
 
 	@Test
-	void rejectsChannelNotAssignedToCampaign() {
+	void acceptsExistingChannelWithoutCampaignAssignment() {
 		Campaign campaign = seedCampaign();
 		Channel foreign = new Channel();
 		foreign.setName("Canal ajeno");
 		channelRepository.save(foreign);
 		long eventsBefore = eventRepository.count();
 
-		assertThatThrownBy(() -> eventService.registerEvent(new EventRequest(
-				"u-ajeno", "visita", "Canal ajeno", campaign.getId(), LocalDate.of(2026, 1, 10))))
-				.isInstanceOf(BadRequestException.class);
+		EventResponse response = eventService.registerEvent(new EventRequest(
+				"u-ajeno", "visita", "Canal ajeno", campaign.getId(), LocalDate.of(2026, 1, 10)));
 
-		assertThat(eventRepository.count()).isEqualTo(eventsBefore);
+		assertThat(response.channelName()).isEqualTo("Canal ajeno");
+		assertThat(eventRepository.count()).isEqualTo(eventsBefore + 1);
 	}
 
 	@Test

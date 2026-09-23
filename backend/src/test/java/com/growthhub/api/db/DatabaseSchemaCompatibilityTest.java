@@ -18,9 +18,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Verifica que backend/db/base-de-datos-mvp.sql (el esquema de referencia del MVP)
- * se ejecuta realmente sobre H2 y define la estructura que los módulos de user,
- * tracking y analytics asumen.
+ * Comprueba que el SQL de referencia se ejecuta en H2 y crea las tablas y la
+ * clave foranea de tracking. No valida los mappings JPA contra ese esquema.
  *
  * Nota 1: las pruebas con Hibernate generan el esquema desde las entidades JPA y no
  * cubren ni la tabla funnel_stages ni la FK funnel_events.stage -> funnel_stages.key;
