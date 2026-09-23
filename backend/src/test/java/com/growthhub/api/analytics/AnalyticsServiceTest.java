@@ -101,6 +101,33 @@ class AnalyticsServiceTest {
 		});
 	}
 
+	@Test
+	void doesNotDuplicateUsersByRepeatedEvents() {
+		event("u1", "visita", "Email", 4);
+		event("u1", "visita", "Email", 5);
+
+		FunnelSummaryResponse funnel = analyticsService.getFunnel();
+		assertThat(usersAt(funnel, FunnelStage.VISITA)).isEqualTo(3);
+		assertThat(usersAt(funnel, FunnelStage.REGISTRO)).isEqualTo(2);
+
+		List<SegmentResponse> segments = analyticsService.getSegments();
+		assertThat(segments).filteredOn(segment -> segment.stage() == FunnelStage.ACTIVACION)
+				.allSatisfy(segment -> assertThat(segment.users()).isEqualTo(1));
+	}
+
+	@Test
+	void segmentUsesFirstEventChannelOnDateTie() {
+		event("u-tie", "visita", "Email", 6);
+		event("u-tie", "registro", "Google Ads", 6);
+
+		List<SegmentResponse> segments = analyticsService.getSegments();
+
+		assertThat(segments).anySatisfy(segment -> {
+			assertThat(segment.stage()).isEqualTo(FunnelStage.REGISTRO);
+			assertThat(segment.channelName()).isEqualTo("Email");
+		});
+	}
+
 	private long usersAt(FunnelSummaryResponse funnel, FunnelStage stage) {
 		return funnel.stages().stream()
 				.filter(item -> item.stage() == stage)

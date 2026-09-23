@@ -227,3 +227,10 @@ yarn-debug.log*
 yarn-error.log*
 frontend/dist/
 frontend/.vite/
+
+# Java / JVM
+*.class
+.gradle/
+out/
+hs_err_pid*
+replay_pid*
