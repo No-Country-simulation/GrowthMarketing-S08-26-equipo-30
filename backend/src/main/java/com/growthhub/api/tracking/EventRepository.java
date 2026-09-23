@@ -12,9 +12,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 	@Query("select distinct e.stage from Event e where e.user.id = :userId")
 	List<FunnelStage> findDistinctStagesByUserId(@Param("userId") String userId);
 
-	@Query("select distinct e.user.id from Event e where e.stage = :stage")
-	List<String> findDistinctUserIdsByStage(@Param("stage") FunnelStage stage);
+	@Query("select distinct e.user.id, e.stage from Event e")
+	List<Object[]> findDistinctUserStages();
 
-	@Query("select e from Event e order by e.eventDate asc, e.id asc")
+	@Query("select e from Event e join fetch e.channel join fetch e.user order by e.eventDate asc, e.id asc")
 	List<Event> findAllOrdered();
 }

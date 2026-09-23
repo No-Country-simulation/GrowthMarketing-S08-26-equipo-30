@@ -48,6 +48,18 @@ public class EventService {
 			throw new BadRequestException("La fecha del evento es obligatoria");
 		}
 
+		Campaign campaign = campaignRepository.findById(request.campaignId())
+				.orElseThrow(() -> new NotFoundException("Campaña no encontrada"));
+
+		Channel channel = channelRepository.findByNameIgnoreCase(request.channelName().trim())
+				.orElseThrow(() -> new NotFoundException("Canal no encontrado"));
+
+		boolean belongsToCampaign = campaign.getChannels().stream()
+				.anyMatch(assigned -> assigned.getId().equals(channel.getId()));
+		if (!belongsToCampaign) {
+			throw new BadRequestException("El canal no pertenece a la campaña");
+		}
+
 		String userId = request.userId().trim();
 		User user = userRepository.findById(userId).orElseGet(() -> {
 			User created = new User();
@@ -55,12 +67,6 @@ public class EventService {
 			created.setDemo(false);
 			return userRepository.save(created);
 		});
-
-		Campaign campaign = campaignRepository.findById(request.campaignId())
-				.orElseThrow(() -> new NotFoundException("Campaña no encontrada"));
-
-		Channel channel = channelRepository.findByNameIgnoreCase(request.channelName().trim())
-				.orElseThrow(() -> new NotFoundException("Canal no encontrado"));
 
 		Event event = new Event();
 		event.setUser(user);
