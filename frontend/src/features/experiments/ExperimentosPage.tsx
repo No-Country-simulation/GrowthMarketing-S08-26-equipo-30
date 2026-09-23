@@ -8,14 +8,25 @@ import type { ExperimentCardData } from "@/features/experiments/experimentsData"
 interface ExperimentosPageProps {
   onNavigate: (view: AppView) => void;
   createdExperiments: ExperimentCardData[];
+  onOpenExperimentDetail: (id: string) => void;
+  closedOverrides?: Record<string, ExperimentCardData>;
 }
 
 export default function ExperimentosPage({
   onNavigate,
   createdExperiments,
+  onOpenExperimentDetail,
+  closedOverrides = {},
 }: ExperimentosPageProps) {
   const data = experimentsData;
-  const experiments = [...createdExperiments, ...data.experiments];
+  const experiments = [
+    ...createdExperiments.map(
+      (experiment) => closedOverrides[experiment.id] ?? experiment
+    ),
+    ...data.experiments.map(
+      (experiment) => closedOverrides[experiment.id] ?? experiment
+    ),
+  ];
   return (
     <div className="experimentos-root">
       <Topbar
@@ -33,7 +44,11 @@ export default function ExperimentosPage({
         </header>
         <div className="experiments-list">
           {experiments.map((experiment) => (
-            <ExperimentCard key={experiment.id} data={experiment} />
+            <ExperimentCard
+              key={experiment.id}
+              data={experiment}
+              onOpenDetail={onOpenExperimentDetail}
+            />
           ))}
         </div>
       </main>

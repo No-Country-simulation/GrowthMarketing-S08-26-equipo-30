@@ -2,8 +2,10 @@ export type AppView =
   | "resumen"
   | "funnel"
   | "canales"
+  | "campanas"
   | "oportunidades"
-  | "experimentos";
+  | "experimentos"
+  | "experimentoDetalle";
 
 export interface NavItem {
   id:

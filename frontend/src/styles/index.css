@@ -2154,6 +2154,7 @@ button.nav-item {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   padding: 10px 0 0;
   width: 1061px;
@@ -2167,6 +2168,25 @@ button.nav-item {
   line-height: 15px;
   color: #797a85;
   white-space: nowrap;
+}
+
+.experiment-detail-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 32px;
+  padding: 0 16px;
+  background: #1751c8;
+  border: none;
+  border-radius: 48px;
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 16px;
+  color: #f3f1ef;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: none;
 }
 
 /* Create hypothesis modal */
@@ -2463,4 +2483,998 @@ button.nav-item {
   color: #f3f1ef;
   cursor: pointer;
   white-space: nowrap;
+}
+
+/* Experiment detail */
+
+.experiment-detail-root {
+  position: relative;
+  width: 1440px;
+  min-height: 1282px;
+  background: #f3f1ef;
+  border-radius: 20px;
+}
+
+.experiment-detail-root .topbar {
+  gap: 269px;
+}
+
+.experiment-detail-root .sidebar {
+  height: 1282px;
+  gap: 702px;
+}
+
+.experiment-detail-main {
+  position: absolute;
+  left: 270px;
+  top: 82px;
+  width: 1101px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 20px;
+}
+
+.experiment-detail-summary {
+  width: 1101px;
+  min-height: 134.54px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.experiment-detail-summary-tags {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  height: 27px;
+}
+
+.experiment-detail-summary-title {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 23px;
+  color: #000000;
+  white-space: nowrap;
+}
+
+.experiment-detail-summary-hypothesis {
+  margin: 0;
+  max-width: 1061px;
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+  color: #797a85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.experiment-detail-metrics {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  width: 1061px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(226, 224, 217, 0.5);
+}
+
+.experiment-detail-metric {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  height: 18px;
+}
+
+.experiment-detail-metric-label {
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  color: #797a85;
+  white-space: nowrap;
+}
+
+.experiment-detail-metric-value {
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 18px;
+  color: #000026;
+  white-space: nowrap;
+}
+
+.experiment-detail-results {
+  width: 1101px;
+  height: 380px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.experiment-detail-results-header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+  width: 1061px;
+  height: 30px;
+}
+
+.experiment-detail-results-title {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 30px;
+  color: #000026;
+  white-space: nowrap;
+}
+
+.experiment-detail-results-caption {
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  color: #797a85;
+  white-space: nowrap;
+}
+
+.experiment-detail-variant {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.experiment-detail-variant-head {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 1061px;
+  height: 23px;
+}
+
+.experiment-detail-variant-title-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.experiment-detail-variant-badge {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 22px;
+  height: 22px;
+  background: #1751c8;
+  border-radius: 50%;
+  font-family: "Outfit", sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 15px;
+  color: #ffffff;
+  flex: none;
+}
+
+.experiment-detail-variant-title {
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 23px;
+  color: #000026;
+  white-space: nowrap;
+}
+
+.experiment-detail-variant-conversion {
+  font-family: "Outfit", sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 23px;
+  color: #1751c8;
+  white-space: nowrap;
+}
+
+.experiment-detail-variant-desc {
+  margin: 0;
+  width: 1061px;
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+  color: #797a85;
+}
+
+.experiment-detail-variant-bar-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  width: 1061px;
+}
+
+.experiment-detail-variant-bar-track {
+  flex: 1;
+  height: 12px;
+  border-radius: 6px;
+  background: rgba(226, 224, 217, 0.5);
+  overflow: hidden;
+}
+
+.experiment-detail-variant-bar-fill {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+}
+
+.experiment-detail-variant-bar-fill-a {
+  background: #ce8bff;
+}
+
+.experiment-detail-variant-bar-fill-b {
+  background: #1751c8;
+}
+
+.experiment-detail-variant-exposed {
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  color: #797a85;
+  white-space: nowrap;
+  flex: none;
+}
+
+.experiment-detail-notes {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  color: #797a85;
+}
+
+.experiment-detail-two-col {
+  display: flex;
+  gap: 19px;
+  width: 1101px;
+}
+
+.experiment-detail-panel {
+  width: 541px;
+  height: 305px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.experiment-detail-panel-title {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 23px;
+  color: #000026;
+  white-space: nowrap;
+}
+
+.experiment-detail-panel-subtitle {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 15px;
+  text-transform: uppercase;
+  color: #1751c8;
+  white-space: nowrap;
+}
+
+.experiment-detail-comments {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.experiment-detail-comment {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.experiment-detail-comment-avatar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ce8bff;
+  font-family: "Outfit", sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 15px;
+  color: #ffffff;
+  flex: none;
+}
+
+.experiment-detail-comment-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.experiment-detail-comment-header {
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 15px;
+  color: #000026;
+  white-space: nowrap;
+}
+
+.experiment-detail-comment-text {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 17px;
+  color: #797a85;
+}
+
+.experiment-detail-panel-notes {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+  color: #797a85;
+}
+
+.experiment-detail-tags {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.experiment-detail-tag {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  padding: 6px 12px;
+  background: rgba(23, 81, 200, 0.1);
+  border-radius: 20px;
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 15px;
+  color: #1751c8;
+  white-space: nowrap;
+}
+
+.experiment-detail-close-card {
+  width: 1101px;
+  height: 98px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.experiment-detail-close-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.experiment-detail-close-title {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 23px;
+  color: #000026;
+}
+
+.experiment-detail-close-text {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+  color: #797a85;
+}
+
+.experiment-detail-close-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 198px;
+  height: 44px;
+  background: #1751c8;
+  border: none;
+  border-radius: 48px;
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  color: #f3f1ef;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: none;
+}
+
+/* Close experiment modal */
+
+.close-experiment-overlay {
+  position: absolute;
+  left: -1px;
+  top: 0;
+  width: 1441px;
+  height: 1282px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+
+.close-experiment-modal {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  width: 697px;
+  height: 779px;
+  padding: 14px 28px;
+  background: #ffffff;
+  border-radius: 12px;
+}
+
+.close-experiment-header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 641px;
+}
+
+.close-experiment-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.close-experiment-title {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 30px;
+  color: #000026;
+}
+
+.close-experiment-subtitle {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+  color: #797a85;
+}
+
+.close-experiment-close {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 8px;
+  background: rgba(121, 122, 133, 0.1);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  flex: none;
+}
+
+.close-experiment-close img {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.close-experiment-about {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 641px;
+  padding: 14px 16px;
+  background: #f3f1ef;
+  border-radius: 8px;
+}
+
+.close-experiment-about-title {
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  color: #000026;
+  white-space: nowrap;
+}
+
+.close-experiment-about-text {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 17px;
+  color: #797a85;
+}
+
+.close-experiment-field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.close-experiment-label {
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 15px;
+  text-transform: uppercase;
+  color: #1751c8;
+  white-space: nowrap;
+}
+
+.close-experiment-result-cards {
+  display: flex;
+  flex-direction: row;
+  gap: 19px;
+  width: 641px;
+}
+
+.close-experiment-result-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  width: 311px;
+  height: 71px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border: 1px solid #b8bcc2;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: "Outfit", sans-serif;
+  text-align: left;
+}
+
+.close-experiment-result-card-active {
+  border-color: #1751c8;
+  background: rgba(23, 81, 200, 0.06);
+}
+
+.close-experiment-result-title {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  color: #000026;
+}
+
+.close-experiment-result-desc {
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 17px;
+  color: #797a85;
+}
+
+.close-experiment-learning {
+  width: 641px;
+  height: 120px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border: 1px solid #b8bcc2;
+  border-radius: 8px;
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+  color: #000026;
+  resize: none;
+  outline: none;
+}
+
+.close-experiment-learning:focus {
+  border-color: #1751c8;
+}
+
+.close-experiment-footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  width: 641px;
+}
+
+.close-experiment-cancel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 91px;
+  height: 42px;
+  background: #ffffff;
+  border: 1px solid rgba(121, 122, 133, 0.4);
+  border-radius: 48px;
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 18px;
+  color: #59595d;
+  cursor: pointer;
+}
+
+.close-experiment-submit {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 189px;
+  height: 42px;
+  background: #939599;
+  border: none;
+  border-radius: 48px;
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 18px;
+  color: #ffffff;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.close-experiment-submit-enabled {
+  background: #1751c8;
+}
+
+/* Campañas */
+
+.campanas-root {
+  position: relative;
+  width: 1440px;
+  min-height: 1447px;
+  background: #f3f1ef;
+  border-radius: 20px;
+}
+
+.campanas-root .topbar {
+  gap: 311px;
+}
+
+.topbar-campanas {
+  gap: 311px;
+}
+
+.campanas-root .sidebar {
+  height: 1447px;
+  gap: 877px;
+}
+
+.campanas-main {
+  position: absolute;
+  left: 270px;
+  top: 82px;
+  width: 1102px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.campanas-header-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 1102px;
+  padding: 20px 0 0;
+}
+
+.campanas-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 1102px;
+}
+
+.campanas-notice {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  width: 1102px;
+  height: 56px;
+  padding: 18px 20px;
+  background: rgba(184, 188, 194, 0.3);
+  border-radius: 47px;
+}
+
+.campanas-notice-icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.campanas-notice-text {
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+  color: #797a85;
+  white-space: nowrap;
+}
+
+.campanas-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  width: 1101px;
+}
+
+.campaign-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  width: 1101px;
+  height: 360px;
+  padding: 20px 22px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px -4px rgba(22, 34, 51, 0.08);
+}
+
+.campaign-card-head {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 1057px;
+}
+
+.campaign-title-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.campaign-title {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 25px;
+  color: #000026;
+  white-space: nowrap;
+}
+
+.campaign-date {
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 16px;
+  color: #797a85;
+  white-space: nowrap;
+}
+
+.campaign-head-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.campaign-status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 27px;
+  padding: 6px;
+  border-radius: 28px;
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 15px;
+  white-space: nowrap;
+}
+
+.campaign-status-activo {
+  background: rgba(46, 158, 91, 0.12);
+  color: #2e9e5b;
+}
+
+.campaign-channels {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.campaign-channel {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  background: rgba(184, 188, 194, 0.2);
+  border-radius: 20px;
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  color: #59595d;
+  white-space: nowrap;
+}
+
+.campaign-metrics {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 21px;
+  width: 1057px;
+}
+
+.campaign-metric-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 248px;
+  height: 136px;
+  padding: 20px;
+  background: #f2f2f4;
+  border-radius: 8px;
+}
+
+.campaign-metric-label-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.campaign-metric-icon {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+
+.campaign-metric-label {
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  color: #797a85;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.campaign-metric-value {
+  font-family: "Outfit", sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 30px;
+  color: #000026;
+}
+
+.campaign-metric-caption {
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  color: #797a85;
+  white-space: nowrap;
+}
+
+.campaign-bar {
+  width: 212px;
+  height: 12px;
+  border-radius: 6px;
+  background: rgba(226, 224, 217, 0.5);
+  overflow: hidden;
+}
+
+.campaign-bar-fill {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+}
+
+.campaign-bar-fill-primary {
+  background: #1751c8;
+}
+
+.campaign-bar-fill-secondary {
+  background: #ce8bff;
+}
+
+.campaign-bar-fill-accent {
+  background: #ffb412;
+}
+
+.campaign-bar-fill-success {
+  background: #2e9e5b;
+}
+
+.campaign-summary {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 20px;
+  width: 1057px;
+  padding-top: 18px;
+  border-top: 0.5px solid #b8bcc2;
+}
+
+.campaign-summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.campaign-summary-label {
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  color: #797a85;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.campaign-summary-value {
+  font-family: "Outfit", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 18px;
+  color: #000026;
+  white-space: nowrap;
+}
+
+.campaign-summary-value-success {
+  color: #2e9e5b;
+}
+
+.campaign-summary-value-error {
+  color: #c24a3a;
 }
