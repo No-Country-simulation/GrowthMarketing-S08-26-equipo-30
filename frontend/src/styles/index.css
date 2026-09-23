@@ -3478,3 +3478,374 @@ button.nav-item {
 .campaign-summary-value-error {
   color: #c24a3a;
 }
+
+/* Segmentos */
+
+.segmentos-root {
+  position: relative;
+  width: 1440px;
+  height: 1317px;
+  background: #f3f1ef;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.segmentos-root .topbar {
+  gap: 311px;
+}
+
+.topbar-segmentos {
+  gap: 311px;
+}
+
+.segmentos-root .sidebar {
+  height: 1315.11px;
+  gap: 745px;
+}
+
+.segmentos-main {
+  position: absolute;
+  left: 270px;
+  top: 82px;
+  width: 1102px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.segmentos-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  width: 1102px;
+  padding-top: 20px;
+}
+
+.segments-distribution-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  width: 1101px;
+  height: 405px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px -4px rgba(22, 34, 51, 0.08);
+}
+
+.segments-distribution-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 1061px;
+}
+
+.segments-distribution-title {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 23px;
+  color: #000026;
+}
+
+.segments-distribution-subtitle {
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 16px;
+  color: #797a85;
+}
+
+.segments-distribution-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  width: 1061px;
+}
+
+.segment-distribution-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 1061px;
+}
+
+.segment-distribution-head {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 1061px;
+}
+
+.segment-distribution-name {
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+  color: #000026;
+}
+
+.segment-distribution-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.segment-distribution-percent {
+  font-family: "Outfit", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 18px;
+  color: #000026;
+}
+
+.segment-distribution-users {
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 16px;
+  color: #797a85;
+}
+
+.segment-distribution-track {
+  width: 1061px;
+  height: 12px;
+  border-radius: 6px;
+  background: rgba(226, 224, 217, 0.5);
+}
+
+.segment-distribution-fill {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+}
+
+.segments-distribution-insight {
+  width: 1061px;
+  padding-top: 14px;
+  border-top: 0.5px solid #b8bcc2;
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 17px;
+  color: #797a85;
+}
+
+.segments-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  width: 1102px;
+}
+
+.segments-section-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 1102px;
+}
+
+.segments-section-title {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 23px;
+  color: #000026;
+}
+
+.segments-section-subtitle {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  color: #797a85;
+}
+
+.segments-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  width: 1102px;
+}
+
+.segments-grid-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 20px;
+  width: 1102px;
+}
+
+.segment-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  width: 354px;
+  height: 267px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px -4px rgba(22, 34, 51, 0.08);
+}
+
+.segment-card-wide {
+  width: 541px;
+  height: 249px;
+}
+
+.segment-card-head {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  width: 314px;
+}
+
+.segment-card-wide .segment-card-head {
+  width: 501px;
+}
+
+.segment-card-order {
+  font-family: "Outfit", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 18px;
+  color: #b8bcc2;
+}
+
+.segment-card-name {
+  font-family: "Outfit", sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 23px;
+  color: #000026;
+  white-space: nowrap;
+}
+
+.segment-card-badge {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px;
+  border-radius: 28px;
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 15px;
+  white-space: nowrap;
+}
+
+.segment-card-badge-low {
+  background: rgba(121, 122, 133, 0.12);
+  color: #59595d;
+}
+
+.segment-card-badge-medium {
+  background: rgba(255, 180, 18, 0.12);
+  color: #ffb412;
+}
+
+.segment-card-badge-high {
+  background: rgba(23, 81, 200, 0.1);
+  color: #1751c8;
+}
+
+.segment-card-badge-customer {
+  background: rgba(39, 106, 96, 0.12);
+  color: #276a60;
+}
+
+.segment-card-desc {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 17px;
+  color: #797a85;
+}
+
+.segment-card-bars {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  width: 314px;
+}
+
+.segment-card-wide .segment-card-bars {
+  width: 501px;
+}
+
+.segment-card-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+}
+
+.segment-card-bar-top {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.segment-card-bar-label {
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  color: #797a85;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.segment-card-bar-value {
+  font-family: "Outfit", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 18px;
+  color: #000026;
+  white-space: nowrap;
+}
+
+.segment-card-bar-track {
+  width: 100%;
+  height: 12px;
+  border-radius: 6px;
+  background: rgba(226, 224, 217, 0.5);
+}
+
+.segment-card-bar-fill {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+}
+
+.segment-card-footer {
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 17px;
+  color: #59595d;
+  white-space: nowrap;
+}

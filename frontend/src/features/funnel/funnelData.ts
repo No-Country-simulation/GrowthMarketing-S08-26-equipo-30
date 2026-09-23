@@ -58,7 +58,7 @@ const nav: NavItem[] = [
   { id: "resumen", label: "Resumen", iconSrc: grid01Body, active: false, targetView: "resumen" },
   { id: "funnel", label: "Funnel", iconSrc: funnelAccent, active: true, targetView: "funnel" },
   { id: "canales", label: "Canales", iconSrc: broadcastBody, active: false, targetView: "canales" },
-  { id: "segmentos", label: "Segmentos", iconSrc: peopleBody, active: false },
+  { id: "segmentos", label: "Segmentos", iconSrc: peopleBody, active: false, targetView: "segmentos" },
   { id: "campanas", label: "Campañas", iconSrc: peopleBody, active: false, targetView: "campanas" },
   { id: "experimentos", label: "Experimentos", iconSrc: graphUpArrowBody, active: false, targetView: "experimentos" },
   { id: "oportunidades", label: "Oportunidades", iconSrc: lightbulbBody, active: false, targetView: "oportunidades" },

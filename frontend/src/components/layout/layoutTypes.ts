@@ -2,6 +2,7 @@ export type AppView =
   | "resumen"
   | "funnel"
   | "canales"
+  | "segmentos"
   | "campanas"
   | "oportunidades"
   | "experimentos"

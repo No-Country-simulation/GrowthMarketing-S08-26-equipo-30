@@ -9,7 +9,7 @@ interface TopbarProps {
     dateRange: string;
     channel: string;
   };
-  variant?: "resumen" | "oportunidades" | "funnel" | "canales" | "experimentos" | "campanas";
+  variant?: "resumen" | "oportunidades" | "funnel" | "canales" | "experimentos" | "campanas" | "segmentos";
 }
 
 export default function Topbar({
@@ -28,7 +28,9 @@ export default function Topbar({
             ? "topbar topbar-experimentos"
             : variant === "campanas"
               ? "topbar topbar-campanas"
-              : "topbar";
+              : variant === "segmentos"
+                ? "topbar topbar-segmentos"
+                : "topbar";
   return (
     <header className={className}>
       <span className="topbar-breadcrumb">{breadcrumb}</span>

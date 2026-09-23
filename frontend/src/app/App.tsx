@@ -9,6 +9,7 @@ import ResumenPage from "@/features/dashboard/ResumenPage";
 import FunnelPage from "@/features/funnel/FunnelPage";
 import CanalesPage from "@/features/channels/CanalesPage";
 import CampanasPage from "@/features/campaigns/CampanasPage";
+import SegmentosPage from "@/features/segments/SegmentosPage";
 import OportunidadesPage from "@/features/opportunities/OportunidadesPage";
 import ExperimentosPage from "@/features/experiments/ExperimentosPage";
 import ExperimentDetailPage from "@/features/experiments/ExperimentDetailPage";
@@ -67,6 +68,9 @@ export default function App() {
   }
   if (view === "canales") {
     return <CanalesPage onNavigate={setView} />;
+  }
+  if (view === "segmentos") {
+    return <SegmentosPage onNavigate={setView} />;
   }
   if (view === "campanas") {
     return <CampanasPage onNavigate={setView} />;
