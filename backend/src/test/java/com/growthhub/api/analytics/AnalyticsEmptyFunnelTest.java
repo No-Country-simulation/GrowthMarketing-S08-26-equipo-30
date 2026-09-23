@@ -10,7 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@SpringBootTest(properties =
+		"spring.datasource.url=jdbc:h2:mem:empty_funnel_test;DB_CLOSE_DELAY=-1")
 @Transactional
 class AnalyticsEmptyFunnelTest {
 

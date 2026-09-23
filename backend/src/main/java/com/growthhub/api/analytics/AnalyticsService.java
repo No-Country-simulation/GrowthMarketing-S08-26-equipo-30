@@ -5,7 +5,6 @@ import com.growthhub.api.analytics.dto.FunnelSummaryResponse;
 import com.growthhub.api.analytics.dto.SegmentResponse;
 import com.growthhub.api.shared.FunnelStage;
 import com.growthhub.api.shared.FunnelStageResolver;
-import com.growthhub.api.tracking.Event;
 import com.growthhub.api.tracking.EventRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,12 +102,12 @@ public class AnalyticsService {
 
 	@Transactional(readOnly = true)
 	public List<SegmentResponse> getSegments() {
-		List<Event> events = eventRepository.findAllOrdered();
-		Map<String, Event> firstEventByUser = new LinkedHashMap<>();
+		List<EventRepository.SegmentEventView> events = eventRepository.findEventsForSegments();
+		Map<String, EventRepository.SegmentEventView> firstEventByUser = new LinkedHashMap<>();
 		Map<String, Set<FunnelStage>> stagesByUser = new LinkedHashMap<>();
 
-		for (Event event : events) {
-			String userId = event.getUser().getId();
+		for (EventRepository.SegmentEventView event : events) {
+			String userId = event.getUserId();
 			firstEventByUser.putIfAbsent(userId, event);
 			stagesByUser.computeIfAbsent(userId, key -> new HashSet<>()).add(event.getStage());
 		}
@@ -117,7 +116,7 @@ public class AnalyticsService {
 		for (Map.Entry<String, Set<FunnelStage>> entry : stagesByUser.entrySet()) {
 			String userId = entry.getKey();
 			FunnelStage stage = funnelStageResolver.currentStage(entry.getValue());
-			String channelName = firstEventByUser.get(userId).getChannel().getName();
+			String channelName = firstEventByUser.get(userId).getChannelName();
 			String key = stage.name() + "|" + channelName;
 			SegmentResponse existing = grouped.get(key);
 			if (existing == null) {
