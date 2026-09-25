@@ -1,25 +1,13 @@
-import { useState } from "react";
-import type { AppView } from "@/components/layout/layoutTypes";
-import Topbar from "@/components/layout/Topbar";
-import Sidebar from "@/components/layout/Sidebar";
-import CloseExperimentModal from "@/components/experiments/CloseExperimentModal";
-import type { ExperimentCloseResult } from "@/components/experiments/CloseExperimentModal";
-import { experimentsData } from "@/features/experiments/experimentsData";
-import type {
-  ExperimentCardData,
-  ExperimentDetailData,
-  ExperimentStatus,
-} from "@/features/experiments/experimentsData";
-
-interface ExperimentDetailPageProps {
-  onNavigate: (view: AppView) => void;
-  experiment: ExperimentCardData;
-  onCloseExperiment: (
-    id: string,
-    status: ExperimentStatus,
-    learning: string
-  ) => void;
-}
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import CloseExperimentModal, {
+  type ExperimentCloseResult,
+} from "@/components/experiments/CloseExperimentModal";
+import ExperimentFormModal from "@/features/experiments/ExperimentFormModal";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import { useDemo } from "@/demo/DemoProvider";
+import { selectExperimentById } from "@/demo/demoSelectors";
+import type { ExperimentDetailRecord, ExperimentStatus } from "@/demo/demoTypes";
 
 const STATUS_LABEL: Record<ExperimentStatus, string> = {
   planificado: "Planificado",
@@ -28,60 +16,201 @@ const STATUS_LABEL: Record<ExperimentStatus, string> = {
   noValidado: "No validado",
 };
 
-export default function ExperimentDetailPage({
-  onNavigate,
-  experiment,
-  onCloseExperiment,
-}: ExperimentDetailPageProps) {
-  const [modalOpen, setModalOpen] = useState(false);
-  const data = experimentsData;
-  const detail = experiment.detail;
+export default function ExperimentDetailPage() {
+  const { id } = useParams();
+  const { state, dispatch, notify } = useDemo();
+  const navigate = useNavigate();
+  const experiment = selectExperimentById(state, id);
 
-  const handleConfirmClose = (result: ExperimentCloseResult, learning: string) => {
-    setModalOpen(false);
-    onCloseExperiment(experiment.id, result, learning);
+  const [closeOpen, setCloseOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [launchConfirm, setLaunchConfirm] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+
+  useEffect(() => {
+    if (!experiment && id) {
+      notify("El experimento no existe", "error");
+      navigate("/experimentos", { replace: true });
+    }
+  }, [experiment, id, navigate, notify]);
+
+  if (!experiment) {
+    return null;
+  }
+
+  const detail = experiment.detail;
+  const showResults =
+    Boolean(detail) &&
+    (experiment.status !== "enCurso" ||
+      (detail!.variantA.conversion > 0 || detail!.variantB.conversion > 0));
+
+  const handleConfirmClose = (
+    result: ExperimentCloseResult,
+    conversionA: number,
+    conversionB: number,
+    learning: string,
+  ) => {
+    setCloseOpen(false);
+    dispatch({
+      type: "EXPERIMENT_CLOSE",
+      id: experiment.id,
+      result,
+      conversionA,
+      conversionB,
+      learning,
+    });
+  };
+
+  const handleLaunch = () => {
+    setLaunchConfirm(false);
+    dispatch({ type: "EXPERIMENT_LAUNCH", id: experiment.id });
+  };
+
+  const handleDelete = () => {
+    setDeleteConfirm(false);
+    dispatch({ type: "EXPERIMENT_DELETE", id: experiment.id });
+    navigate("/experimentos");
   };
 
   return (
-    <div className="experiment-detail-root">
-      <Topbar
-        variant="experimentos"
-        breadcrumb="GrowthHub / Experimentos / Detalle del experimento"
-        filters={data.filters}
-      />
-      <Sidebar nav={data.nav} user={data.user} onNavigate={onNavigate} />
-      <main className="experiment-detail-main">
-        <SummarySection experiment={experiment} detail={detail} />
-        {detail ? <ResultsSection detail={detail} /> : null}
-        <div className="experiment-detail-two-col">
-          <CommentsPanel detail={detail} />
-          <NotesPanel detail={detail} />
-        </div>
-        <section className="experiment-detail-close-card">
-          <div className="experiment-detail-close-info">
-            <h2 className="experiment-detail-close-title">
-              ¿Cerrar el experimento?
-            </h2>
-            <p className="experiment-detail-close-text">
-              Se guardará el resultado y el aprendizaje cargado por el equipo.
-            </p>
-          </div>
-          <button
-            type="button"
-            className="experiment-detail-close-btn"
-            onClick={() => setModalOpen(true)}
-          >
-            Cerrar experimento
-          </button>
+    <main className="experiment-detail-main">
+      <SummarySection experiment={experiment} detail={detail} />
+      {experiment.status === "validado" || experiment.status === "noValidado" ? (
+        <section className="experiment-detail-outcome">
+          {experiment.result ? (
+            <div className="experiment-detail-outcome-item">
+              <span className="experiment-detail-outcome-label">Resultado</span>
+              <span className="experiment-detail-outcome-value">
+                {experiment.result}
+              </span>
+            </div>
+          ) : null}
+          {experiment.learning ? (
+            <div className="experiment-detail-outcome-item">
+              <span className="experiment-detail-outcome-label">Aprendizaje</span>
+              <span className="experiment-detail-outcome-value">
+                {experiment.learning}
+              </span>
+            </div>
+          ) : null}
         </section>
-      </main>
+      ) : null}
+      {showResults && detail ? <ResultsSection detail={detail} /> : null}
+      <div className="experiment-detail-two-col">
+        <CommentsPanel detail={detail} />
+        <NotesPanel detail={detail} />
+      </div>
+      <section className="experiment-detail-close-card">
+        {experiment.status === "planificado" ? (
+          <>
+            <div className="experiment-detail-close-info">
+              <h2 className="experiment-detail-close-title">
+                ¿Qué querés hacer con este experimento?
+              </h2>
+              <p className="experiment-detail-close-text">
+                Todavía no se lanzó. Podés editar la hipótesis, lanzarlo o eliminarlo.
+              </p>
+            </div>
+            <div className="experiment-detail-close-actions">
+              <button
+                type="button"
+                className="experiment-detail-ghost-btn"
+                onClick={() => setEditOpen(true)}
+              >
+                Editar hipótesis
+              </button>
+              <button
+                type="button"
+                className="experiment-detail-close-btn"
+                onClick={() => setLaunchConfirm(true)}
+              >
+                Lanzar experimento
+              </button>
+              <button
+                type="button"
+                className="experiment-detail-danger-btn"
+                onClick={() => setDeleteConfirm(true)}
+              >
+                Eliminar
+              </button>
+            </div>
+          </>
+        ) : experiment.status === "enCurso" ? (
+          <>
+            <div className="experiment-detail-close-info">
+              <h2 className="experiment-detail-close-title">
+                ¿Cerrar el experimento?
+              </h2>
+              <p className="experiment-detail-close-text">
+                Se guardará el resultado, las conversiones A/B y el aprendizaje cargado por el equipo.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="experiment-detail-close-btn"
+              onClick={() => setCloseOpen(true)}
+            >
+              Cerrar experimento
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="experiment-detail-close-info">
+              <h2 className="experiment-detail-close-title">
+                Experimento cerrado
+              </h2>
+              <p className="experiment-detail-close-text">
+                El resultado y el aprendizaje quedaron guardados. La edición y el lanzamiento quedaron bloqueados.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="experiment-detail-ghost-btn"
+              onClick={() => navigate("/experimentos")}
+            >
+              Volver a experimentos
+            </button>
+          </>
+        )}
+      </section>
+
       <CloseExperimentModal
         experiment={experiment}
-        open={modalOpen}
-        onCancel={() => setModalOpen(false)}
+        open={closeOpen}
+        onCancel={() => setCloseOpen(false)}
         onConfirm={handleConfirmClose}
       />
-    </div>
+
+      <ExperimentFormModal
+        key={`edit-${experiment.id}`}
+        open={editOpen}
+        experiment={experiment}
+        onClose={() => setEditOpen(false)}
+        onSave={(updated) => {
+          dispatch({ type: "EXPERIMENT_UPDATE", experiment: updated });
+          setEditOpen(false);
+        }}
+      />
+
+      <ConfirmDialog
+        open={launchConfirm}
+        title="Lanzar experimento"
+        message="Se activará con la fecha fija de la demo (6 sep 2026) y quedará en estado En curso."
+        confirmLabel="Lanzar"
+        onConfirm={handleLaunch}
+        onCancel={() => setLaunchConfirm(false)}
+      />
+
+      <ConfirmDialog
+        open={deleteConfirm}
+        title="Eliminar experimento"
+        message="Se eliminará el experimento planificado y su oportunidad de origen volverá a estar abierta."
+        confirmLabel="Eliminar"
+        tone="danger"
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteConfirm(false)}
+      />
+    </main>
   );
 }
 
@@ -89,8 +218,8 @@ function SummarySection({
   experiment,
   detail,
 }: {
-  experiment: ExperimentCardData;
-  detail?: ExperimentDetailData;
+  experiment: NonNullable<ReturnType<typeof selectExperimentById>>;
+  detail?: NonNullable<ReturnType<typeof selectExperimentById>>["detail"];
 }) {
   return (
     <section className="experiment-detail-summary">
@@ -111,7 +240,13 @@ function SummarySection({
           <Metric label="Tráfico" value={detail.traffic} />
           <Metric label="Origen" value={detail.origin} />
         </div>
-      ) : null}
+      ) : (
+        <div className="experiment-detail-metrics">
+          <Metric label="Métrica objetivo" value={experiment.objectiveMetric} />
+          <Metric label="Versión A" value={experiment.variantA} />
+          <Metric label="Versión B" value={experiment.variantB} />
+        </div>
+      )}
     </section>
   );
 }
@@ -125,7 +260,11 @@ function Metric({ label, value }: { label: string; value: string }) {
   );
 }
 
-function ResultsSection({ detail }: { detail: ExperimentDetailData }) {
+function ResultsSection({
+  detail,
+}: {
+  detail: ExperimentDetailRecord;
+}) {
   return (
     <section className="experiment-detail-results">
       <header className="experiment-detail-results-header">
@@ -146,8 +285,9 @@ function VariantRow({
   variant,
 }: {
   badge: string;
-  variant: ExperimentDetailData["variantA"];
+  variant: { label: string; description: string; exposed: number; conversion: number };
 }) {
+  const conversion = `${variant.conversion.toFixed(1).replace(".", ",")} %`;
   return (
     <div className="experiment-detail-variant">
       <div className="experiment-detail-variant-head">
@@ -155,27 +295,29 @@ function VariantRow({
           <span className="experiment-detail-variant-badge">{badge}</span>
           <span className="experiment-detail-variant-title">{variant.label}</span>
         </div>
-        <span className="experiment-detail-variant-conversion">
-          {variant.conversion}
-        </span>
+        <span className="experiment-detail-variant-conversion">{conversion}</span>
       </div>
       <p className="experiment-detail-variant-desc">{variant.description}</p>
       <div className="experiment-detail-variant-bar-row">
         <div className="experiment-detail-variant-bar-track">
           <div
             className={`experiment-detail-variant-bar-fill experiment-detail-variant-bar-fill-${badge.toLowerCase()}`}
-            style={{ width: variant.barWidth }}
+            style={{ width: `${variant.conversion * 100}%` }}
           />
         </div>
         <span className="experiment-detail-variant-exposed">
-          {variant.exposed}
+          {variant.exposed.toLocaleString("es-ES")} visitas expuestas
         </span>
       </div>
     </div>
   );
 }
 
-function CommentsPanel({ detail }: { detail?: ExperimentDetailData }) {
+function CommentsPanel({
+  detail,
+}: {
+  detail?: NonNullable<ReturnType<typeof selectExperimentById>>["detail"];
+}) {
   if (!detail) {
     return <section className="experiment-detail-panel" />;
   }
@@ -197,7 +339,11 @@ function CommentsPanel({ detail }: { detail?: ExperimentDetailData }) {
   );
 }
 
-function NotesPanel({ detail }: { detail?: ExperimentDetailData }) {
+function NotesPanel({
+  detail,
+}: {
+  detail?: NonNullable<ReturnType<typeof selectExperimentById>>["detail"];
+}) {
   if (!detail) {
     return <section className="experiment-detail-panel" />;
   }

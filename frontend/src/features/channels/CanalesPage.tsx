@@ -1,40 +1,41 @@
-import type { AppView } from "@/components/layout/layoutTypes";
-import Sidebar from "@/components/layout/Sidebar";
-import Topbar from "@/components/layout/Topbar";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import ChannelConversionChart from "@/components/channels/ChannelConversionChart";
 import ChannelComparisonTable from "@/components/channels/ChannelComparisonTable";
 import { canalesData } from "@/features/channels/canalesData";
+import { useDemo } from "@/demo/DemoProvider";
+import { selectChannels } from "@/demo/demoSelectors";
 
-interface CanalesPageProps {
-  onNavigate: (view: AppView) => void;
-}
-
-export default function CanalesPage({ onNavigate }: CanalesPageProps) {
+export default function CanalesPage() {
+  const { state } = useDemo();
+  const navigate = useNavigate();
   const data = canalesData;
+  const [searchParams] = useSearchParams();
+  const qualityParam = searchParams.get("quality");
+  const view = selectChannels(state);
+
+  const channels = qualityParam
+    ? view.channels.filter((channel) => channel.quality === qualityParam)
+    : view.channels;
+
   return (
-    <div className="canales-root">
-      <Topbar
-        variant="canales"
-        breadcrumb={data.breadcrumb}
-        filters={data.filters}
+    <main className="canales-main">
+      <header className="canales-header-wrap">
+        <div className="canales-page-header">
+          <h1 className="page-title">{data.title}</h1>
+          <p className="page-subtitle">{data.subtitle}</p>
+        </div>
+      </header>
+      <ChannelConversionChart
+        section={data.conversionSection}
+        channels={channels}
+        onSelectChannel={(id) => navigate(`/campanas?channel=${id}`)}
       />
-      <Sidebar nav={data.nav} user={data.user} onNavigate={onNavigate} />
-      <main className="canales-main">
-        <header className="canales-header-wrap">
-          <div className="canales-page-header">
-            <h1 className="page-title">{data.title}</h1>
-            <p className="page-subtitle">{data.subtitle}</p>
-          </div>
-        </header>
-        <ChannelConversionChart
-          section={data.conversionSection}
-          channels={data.channels}
-        />
-        <ChannelComparisonTable
-          section={data.comparisonSection}
-          channels={data.channels}
-        />
-      </main>
-    </div>
+      <ChannelComparisonTable
+        section={data.comparisonSection}
+        channels={channels}
+        total={view.total}
+        onSelectChannel={(id) => navigate(`/campanas?channel=${id}`)}
+      />
+    </main>
   );
 }

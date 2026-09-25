@@ -2,16 +2,21 @@ import cursorPrimary from "@/assets/icons/figma/cursor-primary.svg";
 import personUpPrimary from "@/assets/icons/figma/person-up-primary.svg";
 import creditCardPrimary from "@/assets/icons/figma/credit-card-primary.svg";
 import graphUpArrowPrimary from "@/assets/icons/figma/graph-up-arrow-primary.svg";
-import type {
-  CampaignMetric,
-  CampaignTrackingData,
-} from "@/features/campaigns/campanasData";
+import EntityActions from "@/components/ui/EntityActions";
+import { onEnterOrSpace } from "@/components/ui/clickable";
+import type { CampaignView } from "@/demo/demoSelectors";
 
 interface CampaignTrackingCardProps {
-  data: CampaignTrackingData;
+  data: CampaignView;
+  expanded?: boolean;
+  onToggle?: () => void;
+  onEdit?: () => void;
+  onPauseResume?: () => void;
+  onFinalize?: () => void;
+  onDelete?: () => void;
 }
 
-const METRIC_ICON: Record<CampaignMetric["label"], string> = {
+const METRIC_ICON: Record<CampaignView["metrics"][number]["label"], string> = {
   VISITAS: cursorPrimary,
   Registros: personUpPrimary,
   Clientes: creditCardPrimary,
@@ -30,17 +35,40 @@ const SUMMARY_ITEMS: {
 
 export default function CampaignTrackingCard({
   data,
+  expanded = false,
+  onToggle,
+  onEdit,
+  onPauseResume,
+  onFinalize,
+  onDelete,
 }: CampaignTrackingCardProps) {
+  const hasActions = Boolean(onEdit || onPauseResume || onFinalize || onDelete);
+  const toggleable = Boolean(onToggle);
+  const pauseResumeLabel =
+    data.status === "activo" ? "Pausar" : "Reactivar";
+
   return (
-    <article className="campaign-card">
+    <article
+      className={`campaign-card${toggleable ? " campaign-card-toggleable" : ""}${
+        expanded ? " campaign-card-expanded" : ""
+      }`}
+      role={toggleable ? "button" : undefined}
+      tabIndex={toggleable ? 0 : undefined}
+      aria-expanded={expanded}
+      aria-label={toggleable ? `Acciones de ${data.title}` : undefined}
+      onClick={() => onToggle?.()}
+      onKeyDown={(event) =>
+        onToggle && onEnterOrSpace(event, onToggle)
+      }
+    >
       <header className="campaign-card-head">
         <div className="campaign-title-group">
           <h2 className="campaign-title">{data.title}</h2>
           <span className="campaign-date">{data.dateRange}</span>
         </div>
         <div className="campaign-head-right">
-          <span className="campaign-status campaign-status-activo">
-            {data.status}
+          <span className={`campaign-status campaign-status-${data.status}`}>
+            {data.statusLabel}
           </span>
           <div className="campaign-channels">
             {data.channels.map((channel) => (
@@ -88,6 +116,28 @@ export default function CampaignTrackingCard({
           );
         })}
       </footer>
+      {hasActions && expanded ? (
+        <EntityActions
+          actions={[
+            ...(onEdit ? [{ label: "Editar", onClick: onEdit }] : []),
+            ...(onPauseResume
+              ? [{ label: pauseResumeLabel, onClick: onPauseResume }]
+              : []),
+            ...(onFinalize
+              ? [{ label: "Finalizar", onClick: onFinalize }]
+              : []),
+            ...(onDelete
+              ? [
+                  {
+                    label: "Eliminar",
+                    tone: "danger" as const,
+                    onClick: onDelete,
+                  },
+                ]
+              : []),
+          ]}
+        />
+      ) : null}
     </article>
   );
 }

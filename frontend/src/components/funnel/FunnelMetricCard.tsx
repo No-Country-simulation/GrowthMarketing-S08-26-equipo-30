@@ -1,7 +1,9 @@
-import type { FunnelMetricData } from "@/features/funnel/funnelData";
-
 interface FunnelMetricCardProps {
-  data: FunnelMetricData;
+  data: {
+    label: string;
+    value: string;
+    caption: string;
+  };
 }
 
 export default function FunnelMetricCard({ data }: FunnelMetricCardProps) {

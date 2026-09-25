@@ -1,14 +1,19 @@
 import { useState } from "react";
-import xLgIcon from "@/assets/icons/figma/x-lg.svg";
-import type { ExperimentCardData } from "@/features/experiments/experimentsData";
+import DemoDialog from "@/components/ui/DemoDialog";
+import type { ExperimentView } from "@/demo/demoSelectors";
 
 export type ExperimentCloseResult = "validado" | "noValidado";
 
 interface CloseExperimentModalProps {
-  experiment: ExperimentCardData;
+  experiment: ExperimentView;
   open: boolean;
   onCancel: () => void;
-  onConfirm: (result: ExperimentCloseResult, learning: string) => void;
+  onConfirm: (
+    result: ExperimentCloseResult,
+    conversionA: number,
+    conversionB: number,
+    learning: string,
+  ) => void;
 }
 
 export default function CloseExperimentModal({
@@ -19,43 +24,64 @@ export default function CloseExperimentModal({
 }: CloseExperimentModalProps) {
   const [selectedResult, setSelectedResult] =
     useState<ExperimentCloseResult | null>(null);
+  const [conversionA, setConversionA] = useState("");
+  const [conversionB, setConversionB] = useState("");
   const [learning, setLearning] = useState("");
 
-  if (!open) {
-    return null;
-  }
+  const conversionANumber = parseFloat(conversionA.replace(",", "."));
+  const conversionBNumber = parseFloat(conversionB.replace(",", "."));
+  const conversionsValid =
+    !Number.isNaN(conversionANumber) &&
+    !Number.isNaN(conversionBNumber) &&
+    conversionANumber >= 0 &&
+    conversionBNumber >= 0;
+  const canConfirm =
+    selectedResult !== null &&
+    conversionsValid &&
+    learning.trim().length > 0;
 
-  const canConfirm = selectedResult !== null && learning.trim().length > 0;
+  const handleConfirm = () => {
+    if (!canConfirm || !selectedResult) {
+      return;
+    }
+    onConfirm(
+      selectedResult,
+      conversionANumber,
+      conversionBNumber,
+      learning.trim(),
+    );
+  };
 
   return (
-    <div className="close-experiment-overlay">
-      <div className="close-experiment-modal">
-        <header className="close-experiment-header">
-          <div className="close-experiment-heading">
-            <h2 className="close-experiment-title">Cerrar experimento</h2>
-            <p className="close-experiment-subtitle">
-              Se guardará el resultado y el aprendizaje del experimento
-            </p>
-          </div>
+    <DemoDialog
+      open={open}
+      title="Cerrar experimento"
+      subtitle="Se guardará el resultado, las conversiones y el aprendizaje del experimento"
+      onClose={onCancel}
+      width="wide"
+      footer={
+        <>
+          <button type="button" className="demo-button-ghost" onClick={onCancel}>
+            Cancelar
+          </button>
           <button
             type="button"
-            className="close-experiment-close"
-            onClick={onCancel}
-            aria-label="Cerrar"
+            className={`demo-button${canConfirm ? " demo-button-enabled" : ""}`}
+            onClick={handleConfirm}
+            disabled={!canConfirm}
           >
-            <img src={xLgIcon} alt="" />
+            Cerrar experimento
           </button>
-        </header>
-
-        <div className="close-experiment-about">
-          <span className="close-experiment-about-title">
-            {experiment.campaign}
-          </span>
-          <p className="close-experiment-about-text">{experiment.hypothesis}</p>
-        </div>
-
-        <div className="close-experiment-field">
-          <span className="close-experiment-label">Resultado</span>
+        </>
+      }
+    >
+      <div className="close-experiment-about">
+        <span className="close-experiment-about-title">{experiment.campaign}</span>
+        <p className="close-experiment-about-text">{experiment.hypothesis}</p>
+      </div>
+      <div className="demo-form-grid">
+        <fieldset className="demo-form-field demo-form-field-full">
+          <legend className="demo-form-label">Resultado</legend>
           <div className="close-experiment-result-cards">
             <button
               type="button"
@@ -86,42 +112,39 @@ export default function CloseExperimentModal({
               </span>
             </button>
           </div>
-        </div>
-
-        <div className="close-experiment-field">
-          <span className="close-experiment-label">Aprendizaje</span>
+        </fieldset>
+        <label className="demo-form-field">
+          <span className="demo-form-label">Conversión A (%)</span>
+          <input
+            className="demo-input"
+            type="text"
+            inputMode="decimal"
+            value={conversionA}
+            onChange={(event) => setConversionA(event.target.value)}
+            placeholder="Ej. 4,5"
+          />
+        </label>
+        <label className="demo-form-field">
+          <span className="demo-form-label">Conversión B (%)</span>
+          <input
+            className="demo-input"
+            type="text"
+            inputMode="decimal"
+            value={conversionB}
+            onChange={(event) => setConversionB(event.target.value)}
+            placeholder="Ej. 5,6"
+          />
+        </label>
+        <label className="demo-form-field demo-form-field-full">
+          <span className="demo-form-label">Aprendizaje</span>
           <textarea
-            className="close-experiment-learning"
+            className="demo-textarea"
             placeholder="¿Qué aprendió el equipo?"
             value={learning}
             onChange={(event) => setLearning(event.target.value)}
           />
-        </div>
-
-        <footer className="close-experiment-footer">
-          <button
-            type="button"
-            className="close-experiment-cancel"
-            onClick={onCancel}
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            className={`close-experiment-submit${
-              canConfirm ? " close-experiment-submit-enabled" : ""
-            }`}
-            disabled={!canConfirm}
-            onClick={() => {
-              if (selectedResult) {
-                onConfirm(selectedResult, learning.trim());
-              }
-            }}
-          >
-            Cerrar experimento
-          </button>
-        </footer>
+        </label>
       </div>
-    </div>
+    </DemoDialog>
   );
 }

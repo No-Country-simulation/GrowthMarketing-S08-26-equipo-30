@@ -1,6 +1,13 @@
 import arrowDropIcon from "@/assets/icons/figma/arrow-90deg-down-error.svg";
 import arrowCircleIcon from "@/assets/icons/figma/arrow-up-right-circle-fill.svg";
-import type { FunnelStepData } from "@/features/dashboard/resumenData";
+
+export interface FunnelStepData {
+  label: string;
+  value: string;
+  percentage: string;
+  dropLabel?: string;
+  barWidthPx: number;
+}
 
 interface FunnelSummaryProps {
   steps: FunnelStepData[];

@@ -1,27 +1,26 @@
-import type {
-  CanalesData,
-  ChannelData,
-  ChannelQuality,
-} from "@/features/channels/canalesData";
+import type { CanalesPresentationData } from "@/features/channels/canalesData";
+import type { ChannelView } from "@/demo/demoSelectors";
+import { onEnterOrSpace } from "@/components/ui/clickable";
 
 interface ChannelConversionChartProps {
-  section: CanalesData["conversionSection"];
-  channels: ChannelData[];
+  section: CanalesPresentationData["conversionSection"];
+  channels: ChannelView["channels"];
+  onSelectChannel?: (id: string) => void;
 }
 
-const FILL_CLASS: Record<ChannelQuality, string> = {
+const FILL_CLASS: Record<ChannelView["channels"][number]["quality"], string> = {
   alta: "mc-bar-fill-high",
   media: "mc-bar-fill-medium",
   baja: "mc-bar-fill-low",
 };
 
-const PILL_CLASS: Record<ChannelQuality, string> = {
+const PILL_CLASS: Record<ChannelView["channels"][number]["quality"], string> = {
   alta: "mc-pill-high",
   media: "mc-pill-medium",
   baja: "mc-pill-low",
 };
 
-const LEGEND_KEYS: [ChannelQuality, keyof CanalesData["conversionSection"]["legend"]][] = [
+const LEGEND_KEYS: [ChannelView["channels"][number]["quality"], keyof CanalesPresentationData["conversionSection"]["legend"]][] = [
   ["alta", "high"],
   ["media", "medium"],
   ["baja", "low"],
@@ -30,6 +29,7 @@ const LEGEND_KEYS: [ChannelQuality, keyof CanalesData["conversionSection"]["lege
 export default function ChannelConversionChart({
   section,
   channels,
+  onSelectChannel,
 }: ChannelConversionChartProps) {
   return (
     <section className="mc-card">
@@ -53,22 +53,37 @@ export default function ChannelConversionChart({
         </div>
       </div>
       <div className="mc-list">
-        {channels.map((channel) => (
-          <div key={channel.name} className="mc-row">
-            <span className="mc-row-label">{channel.name}</span>
-            <div className="mc-bar">
-              <span
-                className={`mc-bar-fill ${FILL_CLASS[channel.quality]}`}
-                style={{ width: `${channel.barWidthPx}px` }}
-              />
+        {channels.map((channel) => {
+          const selectable = Boolean(onSelectChannel);
+          return (
+            <div
+              key={channel.id}
+              className={`mc-row${selectable ? " mc-row-clickable" : ""}`}
+              role={selectable ? "button" : undefined}
+              tabIndex={selectable ? 0 : undefined}
+              aria-label={
+                selectable ? `Ver campañas del canal ${channel.name}` : undefined
+              }
+              onClick={() => onSelectChannel?.(channel.id)}
+              onKeyDown={(event) =>
+                onSelectChannel && onEnterOrSpace(event, () => onSelectChannel(channel.id))
+              }
+            >
+              <span className="mc-row-label">{channel.name}</span>
+              <div className="mc-bar">
+                <span
+                  className={`mc-bar-fill ${FILL_CLASS[channel.quality]}`}
+                  style={{ width: `${channel.barWidthPx}px` }}
+                />
+              </div>
+              <div className="mc-right">
+                <span className="mc-value">{channel.conversion}</span>
+                <span className="mc-value">{channel.visits}</span>
+                <span className="mc-value">{channel.retention90d}</span>
+              </div>
             </div>
-            <div className="mc-right">
-              <span className="mc-value">{channel.conversion}</span>
-              <span className="mc-value">{channel.visits}</span>
-              <span className="mc-value">{channel.retention90d}</span>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       <p className="mc-footer">{section.footer}</p>
     </section>

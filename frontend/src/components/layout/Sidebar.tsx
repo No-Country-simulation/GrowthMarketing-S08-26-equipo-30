@@ -1,16 +1,10 @@
-import type { AppView, NavItem } from "@/components/layout/layoutTypes";
+import { NavLink, useLocation } from "react-router-dom";
+import UserMenu from "@/components/layout/UserMenu";
+import { DEMO_NAV } from "@/components/layout/navConfig";
 
-interface SidebarProps {
-  nav: NavItem[];
-  user: {
-    initials: string;
-    name: string;
-    role: string;
-  };
-  onNavigate: (view: AppView) => void;
-}
+export default function Sidebar() {
+  const { pathname } = useLocation();
 
-export default function Sidebar({ nav, user, onNavigate }: SidebarProps) {
   return (
     <aside className="sidebar">
       <div className="sidebar-top">
@@ -20,37 +14,32 @@ export default function Sidebar({ nav, user, onNavigate }: SidebarProps) {
         </div>
         <div className="sidebar-menu">
           <span className="sidebar-section">Análisis</span>
-          <nav className="sidebar-nav">
-            {nav.map((item) => {
-              const target = item.targetView;
-              const className = `nav-item${item.active ? " nav-item-active" : ""}`;
-              return target ? (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={className}
-                  onClick={() => onNavigate(target)}
+          <nav className="sidebar-nav" aria-label="Navegación principal">
+            {DEMO_NAV.map((item) => {
+              const active =
+                item.match === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(item.match);
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.match === "/"}
+                  className={`nav-item${active ? " nav-item-active" : ""}`}
                 >
-                  <img className="nav-icon" src={item.iconSrc} alt="" />
+                  <img
+                    className="nav-icon"
+                    src={active ? item.iconActiveSrc : item.iconSrc}
+                    alt=""
+                  />
                   <span className="nav-label">{item.label}</span>
-                </button>
-              ) : (
-                <a key={item.id} href="#" className={className}>
-                  <img className="nav-icon" src={item.iconSrc} alt="" />
-                  <span className="nav-label">{item.label}</span>
-                </a>
+                </NavLink>
               );
             })}
           </nav>
         </div>
       </div>
-      <div className="sidebar-user">
-        <div className="user-avatar">{user.initials}</div>
-        <div className="user-info">
-          <span className="user-name">{user.name}</span>
-          <span className="user-role">{user.role}</span>
-        </div>
-      </div>
+      <UserMenu />
     </aside>
   );
 }

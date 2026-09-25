@@ -1,15 +1,17 @@
-import type { ChannelQualityData, QualityColor } from "@/features/dashboard/resumenData";
+import type { ChannelQualityItem } from "@/demo/demoSelectors";
+import { onEnterOrSpace } from "@/components/ui/clickable";
 
 interface ChannelQualityDonutProps {
-  data: ChannelQualityData[];
+  data: ChannelQualityItem[];
   section: {
     title: string;
     subtitle: string;
     footer: string;
   };
+  onSelectQuality?: (quality: string) => void;
 }
 
-const COLOR_MAP: Record<QualityColor, string> = {
+const COLOR_MAP: Record<ChannelQualityItem["color"], string> = {
   secondary: "#CE8BFF",
   accent: "#FFB412",
   error: "#C24A3A",
@@ -24,22 +26,35 @@ interface DonutSegment {
   color: string;
   dashLength: number;
   dashOffset: number;
+  onClick: () => void;
 }
 
-function buildSegments(data: ChannelQualityData[]): DonutSegment[] {
+function buildSegments(
+  data: ChannelQualityItem[],
+  onSelectQuality?: (quality: string) => void,
+): DonutSegment[] {
   let offset = 0;
   return data.map((item) => {
     const fraction =
       parseFloat(item.percentage.replace("%", "").replace(",", ".").trim()) / 100;
     const dashLength = fraction * DONUT_CIRCUMFERENCE;
-    const segment: DonutSegment = { color: COLOR_MAP[item.color], dashLength, dashOffset: offset };
+    const segment: DonutSegment = {
+      color: COLOR_MAP[item.color],
+      dashLength,
+      dashOffset: offset,
+      onClick: () => onSelectQuality?.(item.quality),
+    };
     offset -= dashLength;
     return segment;
   });
 }
 
-export default function ChannelQualityDonut({ data, section }: ChannelQualityDonutProps) {
-  const segments = buildSegments(data);
+export default function ChannelQualityDonut({
+  data,
+  section,
+  onSelectQuality,
+}: ChannelQualityDonutProps) {
+  const segments = buildSegments(data, onSelectQuality);
   const center = data[0];
   return (
     <section className="quality-card">
@@ -69,14 +84,27 @@ export default function ChannelQualityDonut({ data, section }: ChannelQualityDon
               />
             ))}
           </svg>
-          <div className="donut-center">
+          <button
+            type="button"
+            className="donut-center"
+            onClick={() => onSelectQuality?.(center.quality)}
+            aria-label={`Ver canales de ${center.label.toLowerCase()}`}
+          >
             <span className="donut-center-value">{center.percentage}</span>
             <span className="donut-center-label">{center.label}</span>
-          </div>
+          </button>
         </div>
         <div className="quality-legend">
           {data.map((item) => (
-            <div key={item.label} className="legend-row">
+            <button
+              key={item.label}
+              type="button"
+              className="legend-row legend-row-button"
+              onClick={() => onSelectQuality?.(item.quality)}
+              onKeyDown={(event) =>
+                onSelectQuality && onEnterOrSpace(event, () => onSelectQuality(item.quality))
+              }
+            >
               <div className="legend-left">
                 <span
                   className="legend-dot"
@@ -88,7 +116,7 @@ export default function ChannelQualityDonut({ data, section }: ChannelQualityDon
                 <span className="legend-value">{item.value}</span>
                 <span className="legend-percent">{item.percentage}</span>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>

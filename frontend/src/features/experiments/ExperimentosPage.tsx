@@ -1,57 +1,120 @@
-import type { AppView } from "@/components/layout/layoutTypes";
-import Sidebar from "@/components/layout/Sidebar";
-import Topbar from "@/components/layout/Topbar";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ExperimentCard from "@/components/experiments/ExperimentCard";
-import { experimentsData } from "@/features/experiments/experimentsData";
-import type { ExperimentCardData } from "@/features/experiments/experimentsData";
+import ExperimentFormModal from "@/features/experiments/ExperimentFormModal";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import { experimentosData } from "@/features/experiments/experimentsData";
+import { useDemo } from "@/demo/DemoProvider";
+import { selectExperiments } from "@/demo/demoSelectors";
+import type { ExperimentRecord } from "@/demo/demoTypes";
 
-interface ExperimentosPageProps {
-  onNavigate: (view: AppView) => void;
-  createdExperiments: ExperimentCardData[];
-  onOpenExperimentDetail: (id: string) => void;
-  closedOverrides?: Record<string, ExperimentCardData>;
-}
+export default function ExperimentosPage() {
+  const { state, dispatch } = useDemo();
+  const navigate = useNavigate();
+  const data = experimentosData;
+  const experiments = selectExperiments(state);
+  const [editing, setEditing] = useState<ExperimentRecord | null>(null);
+  const [formOpen, setFormOpen] = useState(false);
+  const [formSession, setFormSession] = useState(0);
+  const [deleting, setDeleting] = useState<ExperimentRecord | null>(null);
+  const [launching, setLaunching] = useState<ExperimentRecord | null>(null);
 
-export default function ExperimentosPage({
-  onNavigate,
-  createdExperiments,
-  onOpenExperimentDetail,
-  closedOverrides = {},
-}: ExperimentosPageProps) {
-  const data = experimentsData;
-  const experiments = [
-    ...createdExperiments.map(
-      (experiment) => closedOverrides[experiment.id] ?? experiment
-    ),
-    ...data.experiments.map(
-      (experiment) => closedOverrides[experiment.id] ?? experiment
-    ),
-  ];
+  const handleSave = (experiment: ExperimentRecord) => {
+    if (editing) {
+      dispatch({ type: "EXPERIMENT_UPDATE", experiment });
+    }
+    setFormOpen(false);
+    setEditing(null);
+  };
+
+  const handleLaunch = (id: string) => {
+    dispatch({ type: "EXPERIMENT_LAUNCH", id });
+    navigate(`/experimentos/${id}`);
+  };
+
   return (
-    <div className="experimentos-root">
-      <Topbar
-        variant="experimentos"
-        breadcrumb={data.breadcrumb}
-        filters={data.filters}
-      />
-      <Sidebar nav={data.nav} user={data.user} onNavigate={onNavigate} />
-      <main className="experimentos-main">
-        <header className="experimentos-header-wrap">
-          <div className="experimentos-page-header">
-            <h1 className="page-title">{data.title}</h1>
-            <p className="page-subtitle">{data.subtitle}</p>
-          </div>
-        </header>
+    <main className="experimentos-main">
+      <header className="experimentos-header-wrap">
+        <div className="experimentos-page-header">
+          <h1 className="page-title">{data.title}</h1>
+          <p className="page-subtitle">{data.subtitle}</p>
+        </div>
+      </header>
+      {experiments.length === 0 ? (
+        <div className="demo-empty-state">
+          No hay experimentos para “{state.filters.search.trim()}”.
+        </div>
+      ) : (
         <div className="experiments-list">
           {experiments.map((experiment) => (
             <ExperimentCard
               key={experiment.id}
               data={experiment}
-              onOpenDetail={onOpenExperimentDetail}
+              onOpenDetail={(id) => navigate(`/experimentos/${id}`)}
+              onEdit={(id) => {
+                const record = state.experiments.find((item) => item.id === id);
+                if (record) {
+                  setEditing(record);
+                  setFormSession((s) => s + 1);
+                  setFormOpen(true);
+                }
+              }}
+              onLaunch={(id) => {
+                const record = state.experiments.find((item) => item.id === id);
+                if (record) {
+                  setLaunching(record);
+                }
+              }}
+              onDelete={(id) => {
+                const record = state.experiments.find((item) => item.id === id);
+                if (record) {
+                  setDeleting(record);
+                }
+              }}
             />
           ))}
         </div>
-      </main>
-    </div>
+      )}
+
+      <ExperimentFormModal
+        key={formSession}
+        open={formOpen}
+        experiment={editing}
+        onClose={() => {
+          setFormOpen(false);
+          setEditing(null);
+        }}
+        onSave={handleSave}
+      />
+
+      <ConfirmDialog
+        open={launching !== null}
+        title="Lanzar experimento"
+        message={`Se activará el experimento “${launching?.campaign ?? ""}” con la fecha fija de la demo (6 sep 2026) y quedará en estado En curso.`}
+        confirmLabel="Lanzar"
+        onConfirm={() => {
+          if (launching) {
+            handleLaunch(launching.id);
+          }
+          setLaunching(null);
+        }}
+        onCancel={() => setLaunching(null)}
+      />
+
+      <ConfirmDialog
+        open={deleting !== null}
+        title="Eliminar experimento"
+        message={`Se eliminará el experimento planificado “${deleting?.campaign ?? ""}” y su oportunidad de origen volverá a estar abierta.`}
+        confirmLabel="Eliminar"
+        tone="danger"
+        onConfirm={() => {
+          if (deleting) {
+            dispatch({ type: "EXPERIMENT_DELETE", id: deleting.id });
+          }
+          setDeleting(null);
+        }}
+        onCancel={() => setDeleting(null)}
+      />
+    </main>
   );
 }
