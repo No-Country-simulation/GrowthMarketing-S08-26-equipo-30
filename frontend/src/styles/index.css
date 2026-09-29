@@ -67,6 +67,43 @@ button {
   white-space: nowrap;
 }
 
+.topbar-context {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  min-width: 0;
+  width: 250px;
+}
+
+.api-status {
+  border: 1px solid #d8dde6;
+  border-radius: 999px;
+  color: #5b616e;
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 7px 10px;
+  white-space: nowrap;
+}
+
+.api-status-connected {
+  background: #eaf7ef;
+  border-color: #b8e2c4;
+  color: #276a43;
+}
+
+.api-status-checking {
+  background: #fff7e8;
+  border-color: #f3d29a;
+  color: #8a5b00;
+}
+
+.api-status-unavailable {
+  background: #f5f6f8;
+  color: #5b616e;
+}
+
 .topbar-filters {
   display: flex;
   flex-direction: row;
@@ -4912,4 +4949,89 @@ button.pill:hover {
   font-size: 11px;
   line-height: 14px;
   color: #ffb412;
+}
+
+/* Responsive hardening for production dashboards. */
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.app-shell,
+.campanas-root,
+.resumen-root,
+.funnel-root,
+.canales-root,
+.segmentos-root,
+.experimentos-root,
+.oportunidades-root,
+.campanas-main,
+.resumen-main,
+.funnel-main,
+.canales-main,
+.segmentos-main,
+.experimentos-main,
+.oportunidades-main {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.funnel-card,
+.channel-chart-card,
+.campaign-card,
+.demo-dialog,
+.demo-dialog-wide {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.funnel-row,
+.channel-row,
+.campaign-metric-row {
+  min-width: 0;
+}
+
+.funnel-bar,
+.channel-bar-track,
+.campaign-metric-track,
+.segment-card-bar-track {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.funnel-bar-fill,
+.channel-bar-fill,
+.campaign-metric-fill,
+.segment-card-bar-fill {
+  max-width: 100%;
+}
+
+.demo-dialog {
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+
+@media (max-width: 900px) {
+  .topbar,
+  .sidebar {
+    position: static;
+    width: 100%;
+  }
+
+  .topbar-filters,
+  .demo-form-grid,
+  .dashboard-kpi-grid,
+  .dashboard-lower-grid {
+    grid-template-columns: 1fr;
+  }
 }

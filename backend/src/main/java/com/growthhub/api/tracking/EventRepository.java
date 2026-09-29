@@ -12,13 +12,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
 	interface SegmentEventView {
 		String getUserId();
-
 		FunnelStage getStage();
-
+		Long getChannelId();
 		String getChannelName();
-
 		LocalDate getEventDate();
-
 		Long getId();
 	}
 
@@ -31,6 +28,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 	@Query("""
 			select e.user.id as userId,
 			       e.stage as stage,
+			       e.channel.id as channelId,
 			       e.channel.name as channelName,
 			       e.eventDate as eventDate,
 			       e.id as id
@@ -38,4 +36,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 			order by e.eventDate asc, e.id asc
 			""")
 	List<SegmentEventView> findEventsForSegments();
+
+	@Query("select e.stage, count(distinct e.user.id) from Event e where e.campaign.id = :campaignId group by e.stage")
+	List<Object[]> countStagesByCampaign(@Param("campaignId") String campaignId);
 }

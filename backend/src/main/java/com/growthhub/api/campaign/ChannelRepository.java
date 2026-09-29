@@ -6,5 +6,7 @@ import java.util.Optional;
 
 public interface ChannelRepository extends JpaRepository<Channel, Long> {
 
+	java.util.List<Channel> findAllByOrderByNameAsc();
+
 	Optional<Channel> findByNameIgnoreCase(String name);
 }

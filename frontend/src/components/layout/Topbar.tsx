@@ -39,7 +39,7 @@ export default function Topbar({
   variant,
   showGlobalSearch = false,
 }: TopbarProps) {
-  const { state, dispatch } = useDemo();
+  const { state, dispatch, apiStatus } = useDemo();
   const navigate = useNavigate();
   const { filters } = state;
   const [openMenu, setOpenMenu] = useState<"date" | "channel" | null>(null);
@@ -88,7 +88,18 @@ export default function Topbar({
 
   return (
     <header ref={topbarRef} className={VARIANT_CLASS[variant]}>
-      <span className="topbar-breadcrumb">{breadcrumb}</span>
+      <div className="topbar-context">
+        <span className="topbar-breadcrumb">{breadcrumb}</span>
+        {apiStatus !== "idle" ? (
+          <span className={`api-status api-status-${apiStatus}`}>
+            {apiStatus === "connected"
+              ? "API conectada"
+              : apiStatus === "checking"
+                ? "Conectando API"
+                : "Modo demo"}
+          </span>
+        ) : null}
+      </div>
       <div className="topbar-filters">
         <div className="filter-menu filter-menu-search">
           <div className="pill pill-search">

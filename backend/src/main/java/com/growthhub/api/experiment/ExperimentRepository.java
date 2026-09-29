@@ -7,4 +7,6 @@ import java.util.List;
 public interface ExperimentRepository extends JpaRepository<Experiment, String> {
 
 	List<Experiment> findAllByOrderByStartedAtDescIdAsc();
+
+	boolean existsByCampaignIdAndStatus(String campaignId, ExperimentStatus status);
 }

@@ -61,6 +61,9 @@ public class Experiment {
 	@OneToMany(mappedBy = "experiment", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ExperimentVariant> variants = new ArrayList<>();
 
+	@OneToMany(mappedBy = "experiment", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ExperimentRun> runs = new ArrayList<>();
+
 	public void addVariant(String code, String description) {
 		ExperimentVariant variant = new ExperimentVariant();
 		variant.setExperiment(this);

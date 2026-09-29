@@ -17,6 +17,7 @@ export type DemoAction =
   | { type: "SET_DATE_RANGE"; dateRange: DateRange }
   | { type: "SET_CHANNEL"; channelId: string | "all" }
   | { type: "RESET_DEMO" }
+  | { type: "SERVER_LOAD"; state: DemoState }
   | { type: "CAMPAIGN_CREATE"; campaign: CampaignRecord }
   | { type: "CAMPAIGN_UPDATE"; campaign: CampaignRecord }
   | { type: "CAMPAIGN_DELETE"; id: string }
@@ -71,6 +72,8 @@ export function demoReducer(
       };
     case "RESET_DEMO":
       return createSeedState();
+    case "SERVER_LOAD":
+      return { ...action.state, filters: state.filters };
     case "CAMPAIGN_CREATE":
       return {
         ...state,
@@ -338,6 +341,10 @@ export function newCampaignRecord(
     title: "",
     status: "activo",
     dateRange: "",
+    objective: "",
+    budget: 0,
+    startDate: "",
+    endDate: "",
     channels: [],
     visits: 0,
     registrations: 0,

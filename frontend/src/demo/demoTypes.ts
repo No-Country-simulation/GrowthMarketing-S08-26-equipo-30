@@ -64,6 +64,10 @@ export interface CampaignRecord {
   title: string;
   status: CampaignStatus;
   dateRange: string;
+  objective?: string;
+  budget?: number;
+  startDate?: string;
+  endDate?: string;
   channels: string[];
   visits: number;
   registrations: number;

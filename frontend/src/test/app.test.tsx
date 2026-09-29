@@ -184,21 +184,13 @@ describe("CRUD de campañas", () => {
 
     await user.click(screen.getByRole("button", { name: "Nueva campaña" }));
     await user.type(screen.getByLabelText("Nombre"), "Campaña de prueba");
-    await user.type(screen.getByLabelText("Rango de fechas"), "1 sep – 6 sep 2026");
+    await user.type(screen.getByLabelText("Objetivo"), "100 registros");
+    await user.clear(screen.getByLabelText("Presupuesto USD"));
+    await user.type(screen.getByLabelText("Presupuesto USD"), "1000");
+    await user.type(screen.getByLabelText("Inicio"), "2026-09-01");
+    await user.type(screen.getByLabelText("Fin"), "2026-09-06");
     await user.click(screen.getByRole("checkbox", { name: "Meta Ads · prospecting" }));
-    const visits = screen.getByLabelText("Visitas");
-    await user.clear(visits);
-    await user.type(visits, "1000");
-    const registrations = screen.getByLabelText("Registros");
-    await user.clear(registrations);
-    await user.type(registrations, "100");
-    const customers = screen.getByLabelText("Clientes");
-    await user.clear(customers);
-    await user.type(customers, "20");
-    const retained = screen.getByLabelText("Retenidos");
-    await user.clear(retained);
-    await user.type(retained, "10");
-    await user.click(screen.getByRole("button", { name: "Crear campaña" }));
+    await user.click(screen.getByRole("button", { name: "Registrar campaña" }));
 
     const created = await screen.findByText("Campaña de prueba");
     expect(created).toBeInTheDocument();
@@ -223,9 +215,9 @@ describe("CRUD de campañas", () => {
     expect(editedCard).toBeInTheDocument();
 
     // Eliminar
-    await user.click(within(editedCard).getByRole("button", { name: "Eliminar" }));
+    await user.click(within(editedCard).getByRole("button", { name: "Archivar" }));
     await user.click(
-      within(screen.getByRole("dialog")).getByRole("button", { name: "Eliminar" }),
+      within(screen.getByRole("dialog")).getByRole("button", { name: "Archivar" }),
     );
     await waitFor(() => {
       expect(screen.queryByText("Campaña editada")).not.toBeInTheDocument();
@@ -411,8 +403,11 @@ describe("Persistencia y reinicio", () => {
     const first = renderApp("/campanas");
     await user.click(screen.getByRole("button", { name: "Nueva campaña" }));
     await user.type(screen.getByLabelText("Nombre"), "Campaña persistente");
+    await user.type(screen.getByLabelText("Objetivo"), "100 registros");
+    await user.type(screen.getByLabelText("Inicio"), "2026-09-01");
+    await user.type(screen.getByLabelText("Fin"), "2026-09-06");
     await user.click(screen.getByRole("checkbox", { name: "Búsqueda orgánica" }));
-    await user.click(screen.getByRole("button", { name: "Crear campaña" }));
+    await user.click(screen.getByRole("button", { name: "Registrar campaña" }));
     expect(await screen.findByText("Campaña persistente")).toBeInTheDocument();
     first.unmount();
 
@@ -426,8 +421,11 @@ describe("Persistencia y reinicio", () => {
     renderApp("/campanas");
     await user.click(screen.getByRole("button", { name: "Nueva campaña" }));
     await user.type(screen.getByLabelText("Nombre"), "Campaña a borrar");
+    await user.type(screen.getByLabelText("Objetivo"), "100 registros");
+    await user.type(screen.getByLabelText("Inicio"), "2026-09-01");
+    await user.type(screen.getByLabelText("Fin"), "2026-09-06");
     await user.click(screen.getByRole("checkbox", { name: "Búsqueda orgánica" }));
-    await user.click(screen.getByRole("button", { name: "Crear campaña" }));
+    await user.click(screen.getByRole("button", { name: "Registrar campaña" }));
     expect(await screen.findByText("Campaña a borrar")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Menú de usuario" }));

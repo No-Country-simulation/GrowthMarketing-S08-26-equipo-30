@@ -129,7 +129,7 @@ export default function CampaignTrackingCard({
             ...(onDelete
               ? [
                   {
-                    label: "Eliminar",
+                    label: "Archivar",
                     tone: "danger" as const,
                     onClick: onDelete,
                   },

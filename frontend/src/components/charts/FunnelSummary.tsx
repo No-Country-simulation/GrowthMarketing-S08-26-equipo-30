@@ -7,6 +7,7 @@ export interface FunnelStepData {
   percentage: string;
   dropLabel?: string;
   barWidthPx: number;
+  channelSegments?: { channelName: string; users: number; percentage: number }[];
 }
 
 interface FunnelSummaryProps {
@@ -39,7 +40,7 @@ export default function FunnelSummary({ steps, section, onNavigate }: FunnelSumm
             <div className="funnel-bar">
               <span
                 className="funnel-bar-fill"
-                style={{ width: `${step.barWidthPx}px` }}
+                style={{ width: `${Math.min(100, Math.max(0, step.barWidthPx))}%` }}
               />
             </div>
             {step.dropLabel ? (

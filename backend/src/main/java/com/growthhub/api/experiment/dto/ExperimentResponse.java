@@ -22,5 +22,6 @@ public record ExperimentResponse(
 		Instant endedAt,
 		String winnerCode,
 		String conclusion,
-		List<ExperimentVariantResponse> variants) {
+		List<ExperimentVariantResponse> variants,
+		List<ExperimentRunResponse> runs) {
 }

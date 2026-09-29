@@ -7,6 +7,7 @@ import com.growthhub.api.exception.NotFoundException;
 import com.growthhub.api.experiment.dto.CloseExperimentRequest;
 import com.growthhub.api.experiment.dto.ExperimentRequest;
 import com.growthhub.api.experiment.dto.ExperimentResponse;
+import com.growthhub.api.experiment.dto.ExperimentRunResponse;
 import com.growthhub.api.experiment.dto.ExperimentVariantMetricsRequest;
 import com.growthhub.api.experiment.dto.ExperimentVariantRequest;
 import com.growthhub.api.experiment.dto.ExperimentVariantResponse;
@@ -29,10 +30,13 @@ public class ExperimentService {
 
 	private final ExperimentRepository experimentRepository;
 	private final CampaignRepository campaignRepository;
+	private final ExperimentRunRepository runRepository;
 
-	public ExperimentService(ExperimentRepository experimentRepository, CampaignRepository campaignRepository) {
+	public ExperimentService(ExperimentRepository experimentRepository, CampaignRepository campaignRepository,
+			ExperimentRunRepository runRepository) {
 		this.experimentRepository = experimentRepository;
 		this.campaignRepository = campaignRepository;
+		this.runRepository = runRepository;
 	}
 
 	@Transactional(readOnly = true)
@@ -57,20 +61,23 @@ public class ExperimentService {
 		experiment.setCampaign(campaign);
 		applyRequestFields(experiment, request);
 		experiment.setStatus(ExperimentStatus.BORRADOR);
+		experiment.setEndedAt(null);
+		experiment.setStatus(ExperimentStatus.BORRADOR);
 		return toResponse(experimentRepository.save(experiment));
 	}
 
 	@Transactional
 	public ExperimentResponse updateExperiment(String id, ExperimentRequest request) {
 		Experiment experiment = requireExperiment(id);
-		if (experiment.getStatus() == ExperimentStatus.TERMINADO
-				|| experiment.getStatus() == ExperimentStatus.CANCELADO) {
-			throw new BadRequestException("No se puede editar un experimento terminado o cancelado");
+		if (experiment.getStatus() == ExperimentStatus.ACTIVO || experiment.getStatus() == ExperimentStatus.TERMINADO) {
+			throw new BadRequestException("No se puede editar un experimento activo o terminado");
 		}
 		validateCreateRequest(request);
 		Campaign campaign = requireCampaign(request.campaignId());
 		experiment.setCampaign(campaign);
 		applyRequestFields(experiment, request);
+		experiment.setStatus(ExperimentStatus.BORRADOR);
+		experiment.setEndedAt(null);
 		return toResponse(experiment);
 	}
 
@@ -80,18 +87,21 @@ public class ExperimentService {
 		if (experiment.getStatus() != ExperimentStatus.BORRADOR) {
 			throw new BadRequestException("Solo se puede iniciar un experimento en borrador");
 		}
-		experiment.setStatus(ExperimentStatus.ACTIVO);
-		experiment.setStartedAt(Instant.now());
+		createActiveRun(experiment, Instant.now());
 		return toResponse(experiment);
 	}
 
 	@Transactional
 	public ExperimentResponse closeExperiment(String id, CloseExperimentRequest request) {
 		Experiment experiment = requireExperiment(id);
-		if (experiment.getStatus() != ExperimentStatus.ACTIVO
-				&& experiment.getStatus() != ExperimentStatus.BORRADOR) {
-			throw new BadRequestException("Solo se puede cerrar un experimento activo o en borrador");
+		if (experiment.getStatus() == ExperimentStatus.BORRADOR) {
+			createActiveRun(experiment, Instant.now());
 		}
+		if (experiment.getStatus() != ExperimentStatus.ACTIVO) {
+			throw new BadRequestException("Solo se puede cerrar un experimento activo");
+		}
+		ExperimentRun activeRun = runRepository.findFirstByExperimentIdAndStatusOrderByRunNumberDesc(id, ExperimentStatus.ACTIVO)
+				.orElseThrow(() -> new BadRequestException("No hay una ejecución activa para cerrar"));
 		if (request.conclusion() == null || request.conclusion().isBlank()) {
 			throw new BadRequestException("La conclusión es obligatoria");
 		}
@@ -112,19 +122,49 @@ public class ExperimentService {
 		experiment.setEndedAt(Instant.now());
 		experiment.setConclusion(request.conclusion().trim());
 		experiment.setWinnerCode(winnerCode);
+		activeRun.setStatus(ExperimentStatus.TERMINADO);
+		activeRun.setEndedAt(experiment.getEndedAt());
+		activeRun.setConclusion(experiment.getConclusion());
+		activeRun.setWinnerCode(winnerCode);
 		applyMetrics(experiment, request.variants());
+		applyRunMetrics(activeRun, request.variants());
 		return toResponse(experiment);
 	}
 
 	@Transactional
 	public ExperimentResponse cancelExperiment(String id) {
 		Experiment experiment = requireExperiment(id);
-		if (experiment.getStatus() == ExperimentStatus.TERMINADO) {
-			throw new BadRequestException("No se puede cancelar un experimento terminado");
+		if (experiment.getStatus() != ExperimentStatus.ACTIVO && experiment.getStatus() != ExperimentStatus.BORRADOR) {
+			throw new BadRequestException("Solo se puede cancelar un experimento activo o en borrador");
 		}
+		Instant now = Instant.now();
 		experiment.setStatus(ExperimentStatus.CANCELADO);
-		experiment.setEndedAt(Instant.now());
+		experiment.setEndedAt(now);
+		runRepository.findFirstByExperimentIdAndStatusOrderByRunNumberDesc(id, ExperimentStatus.ACTIVO).ifPresent(run -> {
+			run.setStatus(ExperimentStatus.CANCELADO);
+			run.setEndedAt(now);
+		});
 		return toResponse(experiment);
+	}
+
+	private void createActiveRun(Experiment experiment, Instant now) {
+		experiment.setStatus(ExperimentStatus.ACTIVO);
+		experiment.setStartedAt(now);
+		experiment.setEndedAt(null);
+		ExperimentRun run = new ExperimentRun();
+		run.setExperiment(experiment);
+		run.setRunNumber(runRepository.countByExperimentId(experiment.getId()) + 1);
+		run.setStatus(ExperimentStatus.ACTIVO);
+		run.setStartedAt(now);
+		run.setTargetMetric(experiment.getTargetMetric());
+		for (ExperimentVariant variant : experiment.getVariants()) {
+			ExperimentRunVariant runVariant = new ExperimentRunVariant();
+			runVariant.setRun(run);
+			runVariant.getId().setCode(variant.getId().getCode());
+			runVariant.setDescription(variant.getDescription());
+			run.getVariants().add(runVariant);
+		}
+		experiment.getRuns().add(run);
 	}
 
 	private Experiment requireExperiment(String id) {
@@ -275,6 +315,23 @@ public class ExperimentService {
 		}
 	}
 
+	private void applyRunMetrics(ExperimentRun run, List<ExperimentVariantMetricsRequest> metrics) {
+		Map<String, ExperimentVariantMetricsRequest> byCode = new HashMap<>();
+		for (ExperimentVariantMetricsRequest metric : metrics) {
+			byCode.put(metric.code().trim().toUpperCase(), metric);
+		}
+		for (ExperimentRunVariant variant : run.getVariants()) {
+			ExperimentVariantMetricsRequest metric = byCode.get(variant.getId().getCode());
+			variant.setVisits(metric.visits());
+			variant.setRegistrations(metric.registrations());
+			variant.setActivations(metric.activations());
+			variant.setConversions(metric.conversions());
+			variant.setClicks(metric.clicks());
+			variant.setSpend(metric.spend());
+			variant.setMeasuredAt(metric.measuredAt());
+		}
+	}
+
 	private TargetMetric parseTargetMetric(String value) {
 		if (value == null || value.isBlank()) {
 			throw new BadRequestException("La métrica objetivo es obligatoria");
@@ -335,6 +392,10 @@ public class ExperimentService {
 		}
 		variants.sort((a, b) -> a.code().compareTo(b.code()));
 
+		List<ExperimentRunResponse> runs = runRepository.findByExperimentIdOrderByRunNumberDesc(experiment.getId()).stream()
+				.map(this::toRunResponse)
+				.toList();
+
 		return new ExperimentResponse(
 				experiment.getId(),
 				experiment.getCampaign().getId(),
@@ -349,6 +410,18 @@ public class ExperimentService {
 				experiment.getEndedAt(),
 				experiment.getWinnerCode(),
 				experiment.getConclusion(),
-				variants);
+				variants,
+				runs);
+	}
+	private ExperimentRunResponse toRunResponse(ExperimentRun run) {
+		List<ExperimentVariantResponse> variants = run.getVariants().stream()
+				.map(variant -> new ExperimentVariantResponse(
+						variant.getId().getCode(), variant.getDescription(), variant.getVisits(),
+						variant.getRegistrations(), variant.getActivations(), variant.getConversions(),
+						variant.getClicks(), variant.getSpend(), variant.getMeasuredAt()))
+				.sorted((a, b) -> a.code().compareTo(b.code()))
+				.toList();
+		return new ExperimentRunResponse(run.getId(), run.getRunNumber(), run.getStatus(), run.getStartedAt(),
+				run.getEndedAt(), run.getTargetMetric(), run.getWinnerCode(), run.getConclusion(), variants);
 	}
 }

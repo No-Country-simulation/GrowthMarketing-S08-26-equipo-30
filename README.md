@@ -572,3 +572,11 @@ La prioridad indica qué tan indispensable es cada requisito para el MVP:
 | 1.3     | 2026-09-07  | Se corrigió una contradicción de alcance: GrowthHub registra y analiza campañas, pero no crea las campañas publicitarias (eso se hace en plataformas externas). |
 | 1.4     | 2026-09-07  | Se agregó la sección de criterio de éxito del proyecto. |
 | 1.5     | 2026-09-07  | Se agregaron reglas de negocio (campañas, experimentos, usuarios, datos) y la descripción detallada de pantallas con sus estados (carga, sin datos, error), pensada como guía para el diseño de la interfaz. |
+
+## Actualización GrowthHub producción
+
+- El funnel operativo usa seis etapas: Visita, Registro, Activación, Interacción, Conversión y Retención.
+- Las campañas registradas tienen nombre, objetivo, presupuesto obligatorio en USD, fechas y uno o más canales.
+- Cada usuario pertenece a un único segmento actual: etapa actual alcanzada + canal de primera visita.
+- Los segmentos por canal se consultan desplegando cada etapa del funnel.
+- Los experimentos cancelados pueden editarse; al guardarlos vuelven a BORRADOR y cada activación crea una ejecución versionada nueva.

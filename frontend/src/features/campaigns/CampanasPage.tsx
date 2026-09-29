@@ -130,9 +130,9 @@ export default function CampanasPage() {
 
       <ConfirmDialog
         open={deleting !== null}
-        title="Eliminar campaña"
-        message={`Se eliminará la campaña “${deleting?.title ?? ""}” y su seguimiento. Esta acción no se puede deshacer.`}
-        confirmLabel="Eliminar"
+        title="Archivar campaña"
+        message={`Se archivará la campaña “${deleting?.title ?? ""}” y su seguimiento. Esta acción no se puede deshacer.`}
+        confirmLabel="Archivar"
         tone="danger"
         onConfirm={() => {
           if (deleting) {

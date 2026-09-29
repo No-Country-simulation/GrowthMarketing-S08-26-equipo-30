@@ -30,7 +30,9 @@ export default function FunnelPage() {
       const row = listRef.current?.querySelector(
         `[data-stage="${stageParam.toLowerCase()}"]`,
       );
-      row?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      if (row instanceof HTMLElement && "scrollIntoView" in row) {
+        row.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      }
     });
     return () => window.cancelAnimationFrame(frame);
   }, [stageParam]);

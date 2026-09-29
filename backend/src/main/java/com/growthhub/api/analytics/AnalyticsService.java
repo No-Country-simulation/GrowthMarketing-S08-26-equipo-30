@@ -1,5 +1,6 @@
 package com.growthhub.api.analytics;
 
+import com.growthhub.api.analytics.dto.ChannelSegmentResponse;
 import com.growthhub.api.analytics.dto.FunnelStageResponse;
 import com.growthhub.api.analytics.dto.FunnelSummaryResponse;
 import com.growthhub.api.analytics.dto.SegmentResponse;
@@ -9,6 +10,7 @@ import com.growthhub.api.tracking.EventRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -31,43 +33,40 @@ public class AnalyticsService {
 
 	@Transactional(readOnly = true)
 	public FunnelSummaryResponse getFunnel() {
+		return getFunnel(null, null, null);
+	}
+
+	@Transactional(readOnly = true)
+	public FunnelSummaryResponse getFunnel(LocalDate from, LocalDate to, Long channelId) {
+		Cohort cohort = buildCohort(from, to, channelId);
 		FunnelStage[] stages = FunnelStage.values();
 		long[] users = new long[stages.length];
 		Double[] rates = new Double[stages.length];
+		Map<FunnelStage, Map<String, Long>> segmentCounts = new EnumMap<>(FunnelStage.class);
 
-		Map<FunnelStage, Long> counts = new EnumMap<>(FunnelStage.class);
-		Map<String, Set<FunnelStage>> stagesByUser = new HashMap<>();
-		for (Object[] row : eventRepository.findDistinctUserStages()) {
-			stagesByUser.computeIfAbsent((String) row[0], key -> new HashSet<>()).add((FunnelStage) row[1]);
-		}
-		for (Set<FunnelStage> userStages : stagesByUser.values()) {
-			for (FunnelStage stage : userStages) {
-				counts.merge(stage, 1L, Long::sum);
+		for (UserPath path : cohort.paths().values()) {
+			for (FunnelStage stage : path.stages()) {
+				users[stage.ordinal()]++;
 			}
+			FunnelStage current = funnelStageResolver.currentStage(path.stages());
+			String key = path.channelId() + "|" + path.channelName();
+			segmentCounts.computeIfAbsent(current, ignored -> new LinkedHashMap<>()).merge(key, 1L, Long::sum);
 		}
-		for (int i = 0; i < stages.length; i++) {
-			users[i] = counts.getOrDefault(stages[i], 0L);
-		}
-
 		for (int i = 0; i < stages.length; i++) {
 			if (i == stages.length - 1) {
 				rates[i] = null;
 			} else if (users[i] == 0) {
 				rates[i] = 0.0;
 			} else {
-				long both = countUsersWithBoth(stages[i], stages[i + 1], stagesByUser);
+				long both = countUsersWithBoth(stages[i], stages[i + 1], cohort.paths());
 				rates[i] = both * 100.0 / users[i];
 			}
 		}
 
 		List<FunnelStageResponse> responses = new ArrayList<>();
 		for (int i = 0; i < stages.length; i++) {
-			responses.add(new FunnelStageResponse(
-					stages[i],
-					label(stages[i]),
-					i + 1,
-					users[i],
-					rates[i]));
+			responses.add(new FunnelStageResponse(stages[i], label(stages[i]), i + 1, users[i], rates[i],
+					toChannelSegments(segmentCounts.getOrDefault(stages[i], Map.of()), users[i])));
 		}
 
 		FunnelStage bottleneck = null;
@@ -82,51 +81,76 @@ public class AnalyticsService {
 				bottleneck = stages[i];
 			}
 		}
-
-		return new FunnelSummaryResponse(
-				responses,
-				bottleneck,
-				bottleneck == null ? null : biggestDrop);
-	}
-
-	private long countUsersWithBoth(FunnelStage first, FunnelStage second,
-			Map<String, Set<FunnelStage>> stagesByUser) {
-		long count = 0;
-		for (Set<FunnelStage> userStages : stagesByUser.values()) {
-			if (userStages.contains(first) && userStages.contains(second)) {
-				count++;
-			}
-		}
-		return count;
+		return new FunnelSummaryResponse(responses, bottleneck, bottleneck == null ? null : biggestDrop);
 	}
 
 	@Transactional(readOnly = true)
 	public List<SegmentResponse> getSegments() {
-		List<EventRepository.SegmentEventView> events = eventRepository.findEventsForSegments();
-		Map<String, EventRepository.SegmentEventView> firstEventByUser = new LinkedHashMap<>();
-		Map<String, Set<FunnelStage>> stagesByUser = new LinkedHashMap<>();
+		return getSegments(null, null, null);
+	}
 
-		for (EventRepository.SegmentEventView event : events) {
-			String userId = event.getUserId();
-			firstEventByUser.putIfAbsent(userId, event);
-			stagesByUser.computeIfAbsent(userId, key -> new HashSet<>()).add(event.getStage());
-		}
-
+	@Transactional(readOnly = true)
+	public List<SegmentResponse> getSegments(LocalDate from, LocalDate to, Long channelId) {
+		Cohort cohort = buildCohort(from, to, channelId);
 		Map<String, SegmentResponse> grouped = new LinkedHashMap<>();
-		for (Map.Entry<String, Set<FunnelStage>> entry : stagesByUser.entrySet()) {
-			String userId = entry.getKey();
-			FunnelStage stage = funnelStageResolver.currentStage(entry.getValue());
-			String channelName = firstEventByUser.get(userId).getChannelName();
-			String key = stage.name() + "|" + channelName;
+		for (UserPath path : cohort.paths().values()) {
+			FunnelStage stage = funnelStageResolver.currentStage(path.stages());
+			String key = stage.name() + "|" + path.channelName();
 			SegmentResponse existing = grouped.get(key);
-			if (existing == null) {
-				grouped.put(key, new SegmentResponse(stage, channelName, 1L));
-			} else {
-				grouped.put(key, new SegmentResponse(stage, channelName, existing.users() + 1));
+			grouped.put(key, existing == null
+					? new SegmentResponse(stage, path.channelName(), 1L)
+					: new SegmentResponse(stage, path.channelName(), existing.users() + 1));
+		}
+		return new ArrayList<>(grouped.values());
+	}
+
+	private Cohort buildCohort(LocalDate from, LocalDate to, Long channelId) {
+		Map<String, EventRepository.SegmentEventView> firstVisit = new LinkedHashMap<>();
+		Map<String, UserPath> paths = new LinkedHashMap<>();
+		boolean unfiltered = from == null && to == null && channelId == null;
+		for (EventRepository.SegmentEventView event : eventRepository.findEventsForSegments()) {
+			String userId = event.getUserId();
+			if (unfiltered) {
+				firstVisit.putIfAbsent(userId, event);
+			} else if (event.getStage() == FunnelStage.VISITA) {
+				firstVisit.putIfAbsent(userId, event);
 			}
 		}
+		for (EventRepository.SegmentEventView event : eventRepository.findEventsForSegments()) {
+			EventRepository.SegmentEventView first = firstVisit.get(event.getUserId());
+			if (first == null || !matches(first, event, from, to, channelId)) {
+				continue;
+			}
+			paths.computeIfAbsent(event.getUserId(), ignored -> new UserPath(first.getChannelId(), first.getChannelName(), new HashSet<>()))
+					.stages().add(event.getStage());
+		}
+		return new Cohort(paths);
+	}
 
-		return new ArrayList<>(grouped.values());
+	private boolean matches(EventRepository.SegmentEventView first, EventRepository.SegmentEventView event,
+			LocalDate from, LocalDate to, Long channelId) {
+		if (from != null && first.getEventDate().isBefore(from)) {
+			return false;
+		}
+		if (to != null && first.getEventDate().isAfter(to)) {
+			return false;
+		}
+		if (to != null && event.getEventDate().isAfter(to)) {
+			return false;
+		}
+		return channelId == null || first.getChannelId().equals(channelId);
+	}
+
+	private long countUsersWithBoth(FunnelStage first, FunnelStage second, Map<String, UserPath> paths) {
+		return paths.values().stream().filter(path -> path.stages().contains(first) && path.stages().contains(second)).count();
+	}
+
+	private List<ChannelSegmentResponse> toChannelSegments(Map<String, Long> counts, long total) {
+		return counts.entrySet().stream().map(entry -> {
+			String[] parts = entry.getKey().split("\\|", 2);
+			double percentage = total == 0 ? 0.0 : entry.getValue() * 100.0 / total;
+			return new ChannelSegmentResponse(Long.valueOf(parts[0]), parts[1], entry.getValue(), percentage);
+		}).toList();
 	}
 
 	private String label(FunnelStage stage) {
@@ -138,5 +162,11 @@ public class AnalyticsService {
 			case CONVERSION -> "Conversión";
 			case RETENCION -> "Retención";
 		};
+	}
+
+	private record Cohort(Map<String, UserPath> paths) {
+	}
+
+	private record UserPath(Long channelId, String channelName, Set<FunnelStage> stages) {
 	}
 }

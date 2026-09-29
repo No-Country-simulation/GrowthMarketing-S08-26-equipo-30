@@ -7,9 +7,11 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { DemoState } from "@/demo/demoTypes";
+import type { CampaignRecord, ChannelRecord, DemoState, ExperimentRecord } from "@/demo/demoTypes";
 import { demoReducer, type DemoAction } from "@/demo/demoReducer";
 import { loadState, resetStoredDemo, saveState } from "@/demo/demoStorage";
+import { createSeedState } from "@/demo/demoSeed";
+import { api, getHealth, hasApiBaseUrl, type ApiCampaign, type ApiExperiment, type ApiStatus } from "@/api/client";
 
 export interface Toast {
   id: string;
@@ -24,9 +26,57 @@ interface DemoContextValue {
   dismissToast: (id: string) => void;
   notify: (message: string, tone?: Toast["tone"]) => void;
   resetDemo: () => void;
+  apiStatus: ApiStatus;
 }
 
+
 const DemoContext = createContext<DemoContextValue | null>(null);
+
+function mapCampaign(campaign: ApiCampaign): CampaignRecord {
+  const max = Math.max(campaign.visits, 1);
+  return {
+    id: campaign.id,
+    title: campaign.name,
+    objective: campaign.objective,
+    budget: Number(campaign.budget),
+    startDate: campaign.startDate,
+    endDate: campaign.endDate,
+    status: campaign.status === "PAUSADA" ? "pausado" : campaign.status === "FINALIZADA" ? "finalizado" : "activo",
+    dateRange: `${campaign.startDate} - ${campaign.endDate}`,
+    channels: campaign.channels.map((channel) => String(channel.id)),
+    visits: campaign.visits,
+    registrations: campaign.registrations,
+    customers: campaign.customers,
+    retained: campaign.retained,
+    segmentId: "server",
+    metricsBarWidths: [212, Math.round((campaign.registrations / max) * 212), Math.round((campaign.customers / max) * 212), Math.round((campaign.retained / max) * 212)],
+  };
+}
+
+function mapExperiment(experiment: ApiExperiment): ExperimentRecord {
+  const variantA = experiment.variants.find((variant) => variant.code === "A");
+  const variantB = experiment.variants.find((variant) => variant.code === "B");
+  return {
+    id: experiment.id,
+    status: experiment.viewStatus === "EN_CURSO" ? "enCurso" : experiment.viewStatus === "VALIDADO" ? "validado" : experiment.viewStatus === "NO_VALIDADO" ? "noValidado" : "planificado",
+    type: "Landing",
+    campaign: experiment.campaignName,
+    owner: "Growth · Marketing",
+    dateLabel: experiment.startedAt ? `Activado ${experiment.startedAt.slice(0, 10)}` : "Borrador",
+    hypothesis: experiment.hypothesis,
+    variantA: variantA?.description ?? "Versión A",
+    variantB: variantB?.description ?? "Versión B",
+    objectiveMetric: experiment.targetMetric,
+    conversionA: variantA?.conversions,
+    conversionB: variantB?.conversions,
+    learning: experiment.conclusion,
+  };
+}
+
+function mapChannel(id: number, name: string): ChannelRecord {
+  return { id: String(id), name, visits: 0, registrations: 0, retention90d: 0, quality: "media", barWidth: 50 };
+}
+
 
 function toastMessageFor(action: DemoAction): string | null {
   switch (action.type) {
@@ -80,10 +130,50 @@ function toastMessageFor(action: DemoAction): string | null {
 export function DemoProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(demoReducer, undefined, loadState);
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [apiStatus, setApiStatus] = useState<ApiStatus>("idle");
 
   useEffect(() => {
-    saveState(state);
+    if (!hasApiBaseUrl()) {
+      saveState(state);
+    }
   }, [state]);
+
+  useEffect(() => {
+    if (!hasApiBaseUrl()) {
+      return;
+    }
+
+    const controller = new AbortController();
+    setApiStatus("checking");
+    getHealth(controller.signal)
+      .then(async () => {
+        setApiStatus("connected");
+        const [channels, campaigns, experiments] = await Promise.all([
+          api.channels(),
+          api.campaigns({}),
+          api.experiments(),
+        ]);
+        const seed = createSeedState();
+        dispatch({
+          type: "SERVER_LOAD",
+          state: {
+            ...seed,
+            channels: channels.map((channel) => mapChannel(channel.id, channel.name)),
+            campaigns: campaigns.map(mapCampaign),
+            experiments: experiments.map(mapExperiment),
+          },
+        });
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+        setApiStatus("unavailable");
+        showToast(error instanceof Error ? error.message : "No se pudo conectar con la API", "error");
+      });
+
+    return () => controller.abort();
+  }, []);
 
   const dismissToast = useCallback((id: string) => {
     setToasts((current) => current.filter((toast) => toast.id !== id));
@@ -107,6 +197,41 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       if (message) {
         showToast(message);
       }
+      if (!hasApiBaseUrl()) {
+        return;
+      }
+      const reload = async () => {
+        const [channels, campaigns, experiments] = await Promise.all([api.channels(), api.campaigns({}), api.experiments()]);
+        const seed = createSeedState();
+        dispatch({
+          type: "SERVER_LOAD",
+          state: { ...seed, channels: channels.map((channel) => mapChannel(channel.id, channel.name)), campaigns: campaigns.map(mapCampaign), experiments: experiments.map(mapExperiment) },
+        });
+      };
+      const run = async () => {
+        if (action.type === "CAMPAIGN_CREATE" || action.type === "CAMPAIGN_UPDATE") {
+          const body = {
+            name: action.campaign.title,
+            objective: action.campaign.objective,
+            budget: action.campaign.budget,
+            startDate: action.campaign.startDate,
+            endDate: action.campaign.endDate,
+            channelIds: action.campaign.channels.map(Number),
+          };
+          if (action.type === "CAMPAIGN_CREATE") await api.createCampaign(body);
+          else await api.updateCampaign(action.campaign.id, body);
+          await reload();
+        }
+        if (action.type === "CAMPAIGN_SET_STATUS") {
+          await api.setCampaignStatus(action.id, action.status === "pausado" ? "PAUSADA" : action.status === "finalizado" ? "FINALIZADA" : "ACTIVA");
+          await reload();
+        }
+        if (action.type === "CAMPAIGN_DELETE") {
+          await api.archiveCampaign(action.id);
+          await reload();
+        }
+      };
+      void run().catch((error: unknown) => showToast(error instanceof Error ? error.message : "No se pudo guardar en la API", "error"));
     },
     [showToast],
   );
@@ -126,6 +251,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         dismissToast,
         notify: showToast,
         resetDemo,
+        apiStatus,
       }}
     >
       {children}
